@@ -65,3 +65,22 @@ def test_first_valid_signals_and_oos_guard():
     assert sig.index.max() < oos_start()
     assert sig["z"].first_valid_index().strftime("%Y-%m") == "2013-06"        # 36 months after 2010-06
     assert sig["z_sa"].first_valid_index().strftime("%Y-%m") == "2018-06"     # + 5 years for seasonal mean
+
+
+@needs_data
+def test_p3_sample_rules():
+    """P3 uses only outcomes before oos_start and drops the LEZ2014-affected month-ends (Deviation Log)."""
+    sig = signals.month_end_signals()
+    d = mechanism.p3_data(sig)
+    assert (d["sale_ltd"] < oos_start()).all()
+    assert "LEZ2014" not in set(d["sale_contract"])
+    _, verdict = mechanism.p3_kill_test(sig)
+    assert verdict["dropped_month_ends"] == ["2014-06-30", "2014-07-31", "2014-12-31"]
+    assert (d["spot_change"] - d["fut_change"] - d["sale_minus_front"]).abs().max() < 1e-12
+
+
+@needs_data
+def test_leg_contributions_sum_to_margin_change():
+    legs, _ = mechanism.leg_decomposition(signals.month_end_signals())
+    parts = legs[["LE (sale value)", "GF (feeder cost)", "ZC (corn cost)"]].sum(axis=1)
+    assert (parts - legs["dM (total)"]).abs().max() < 1e-9

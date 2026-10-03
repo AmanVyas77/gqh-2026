@@ -66,17 +66,15 @@ def main() -> None:
           f"range ${m.min():,.0f} to ${m.max():,.0f} per head")
 
 
-    print("\n[3] P1 mechanism test (primary) and pre-declared diagnostics 1a, 2a")
+    print("\n[3] Mechanism: P1 (primary + pre-declared diagnostics 1a, 2a), P3, leg decomposition")
     sig = signals.month_end_signals()
-    p1 = mechanism.p1(sig, {"primary": ["z"], "diag_1a_seasonally_adjusted": ["z_sa"],
-                            "diag_2a_joint_z_and_z_le": ["z", "z_le"]})
-    (RESULTS / "tables").mkdir(parents=True, exist_ok=True)
-    p1.to_csv(RESULTS / "tables" / "mechanism.csv", index=False)
-    mechanism.plot_p1(sig, RESULTS / "figures" / "mechanism.png")
-    for _, r in p1.iterrows():
-        verdict = f"  -> {'PASS' if r['pass'] else 'FAIL'}" if r["spec"] == "primary" else ""
-        print(f"{r['spec']:30s} {r['regressor']:5s} beta {r['beta']:+.4f}  NW t {r['t_nw']:+.2f}  "
+    mech = mechanism.write_mechanism_outputs(sig, RESULTS)
+    for _, r in pd.concat([mech["p1"], mech["p3"]]).iterrows():
+        verdict = f"  -> {'PASS' if r['pass'] else 'FAIL'}" if r.get("spec") == "primary" else ""
+        print(f"{r['test']} {r['spec']:44s} {r['regressor']:5s} beta {r['beta']:+.5f}  NW t {r['t_nw']:+.2f}  "
               f"n {r['n']}{verdict}")
+    print("P3 verdict:", mech["p3_verdict"])
+    print(mech["legs"].round(3).to_string())
 
     print("\n[4] Variant A (primary), drawdown overlay, and diagnostics 1b / 2b")
     variant_a(sig)
