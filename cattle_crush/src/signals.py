@@ -67,3 +67,64 @@ def signal_z(sig: pd.DataFrame, seasonal_adjust: bool | None = None) -> pd.Serie
     if seasonal_adjust is None:
         seasonal_adjust = load_config()["signal"]["seasonal_adjust"]
     return sig["z_sa"] if seasonal_adjust else sig["z"]
+
+
+# --------------------------------------------------------------------------- hedging pressure (Variant C)
+
+def _closed_days() -> pd.DatetimeIndex:
+    """US federal holidays plus documented federal closures (data/manual/federal_closures.csv)."""
+    from pandas.tseries.holiday import USFederalHolidayCalendar
+    from src.config import MANUAL
+
+    extra = pd.to_datetime(pd.read_csv(MANUAL / "federal_closures.csv")["date"])
+    return USFederalHolidayCalendar().holidays("2005-01-01", "2027-12-31").union(pd.DatetimeIndex(extra))
+
+
+def cftc_known_from(asof: pd.Series) -> pd.Series:
+    """Date from which a COT report counts as known (Deviation Log 2026-10-03 17:36):
+    documented disruption date if the as-of date falls in one; else as-of + 6 days, or + 8 if a
+    federal holiday/closure falls in [as-of + 1, as-of + 6]; rolled to the next business day."""
+    from src.config import MANUAL
+
+    closed = _closed_days()
+    bday = pd.offsets.CustomBusinessDay(holidays=closed)
+    out = []
+    for a in pd.to_datetime(asof):
+        lag = 8 if ((closed > a) & (closed <= a + pd.Timedelta(days=6))).any() else 6
+        out.append(bday.rollforward(a + pd.Timedelta(days=lag)))
+    known = pd.Series(out, index=asof.index)
+    dis = pd.read_csv(MANUAL / "cftc_disruptions.csv", parse_dates=["asof_first", "asof_last", "known_from"])
+    for _, w in dis.iterrows():
+        inside = (asof >= w["asof_first"]) & (asof <= w["asof_last"])
+        known[inside] = w["known_from"]
+    return known
+
+
+def hedging_pressure(oos: bool = False) -> pd.DataFrame:
+    """Weekly HP = (PMPU short - PMPU long) / (short + long), Live Cattle, futures only, with the
+    median of the previous `median_lookback_weeks` reports (excluding the current one)."""
+    from src.config import RAW, RAW_OOS
+
+    weeks = load_config()["hedging_pressure"]["median_lookback_weeks"]
+    files = [RAW / "cftc_live_cattle.parquet"] + ([RAW_OOS / "cftc_live_cattle.parquet"] if oos else [])
+    df = pd.concat([pd.read_parquet(f) for f in files if f.exists()]).drop_duplicates("asof_date")
+    df = df.sort_values("asof_date").reset_index(drop=True)
+    long, short = df["prod_merc_positions_long"], df["prod_merc_positions_short"]
+    df["hp"] = (short - long) / (short + long)
+    df["hp_median_prior"] = df["hp"].shift(1).rolling(weeks, min_periods=weeks).median()
+    df["known_from"] = cftc_known_from(df["asof_date"])
+    return df[["asof_date", "known_from", "hp", "hp_median_prior"]]
+
+
+def hp_at(dates, oos: bool = False) -> pd.DataFrame:
+    """Latest COT report known at each date: its as-of date, HP and prior-156-week median."""
+    hp = hedging_pressure(oos).sort_values("known_from")
+    rows = []
+    for t in pd.DatetimeIndex(dates):
+        known = hp[hp["known_from"] <= t]
+        if known.empty:
+            rows.append({"date": t, "asof_date": pd.NaT, "hp": float("nan"), "hp_median_prior": float("nan")})
+            continue
+        r = known.loc[known["asof_date"].idxmax()]
+        rows.append({"date": t, "asof_date": r["asof_date"], "hp": r["hp"], "hp_median_prior": r["hp_median_prior"]})
+    return pd.DataFrame(rows).set_index("date")

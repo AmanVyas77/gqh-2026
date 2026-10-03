@@ -18,6 +18,7 @@ def _market(prices: dict, locked=(), cash_final=None):
     frame = pd.DataFrame({c: pd.Series({pd.Timestamp(d): p for d, p in v}) for c, v in prices.items()})
     m.px = {"LE": frame.sort_index()}
     m.cash_final = cash_final or {}
+    m.has_cash_final = {c for c, _ in m.cash_final}
     m.locked = {(pd.Timestamp(d), c) for d, c in locked}
     m.root_of = {c: "LE" for c in prices}
     m.ltd = {c: pd.Timestamp("2030-01-01") for c in prices}
@@ -70,3 +71,30 @@ def test_overlay_halves_and_restores():
     scales = res.rebalances.set_index("signal_date")["scale"]
     assert scales[D[0]] == 1.0 and scales[D[3]] == 0.5                # 20% drawdown -> halve
     assert scales[D[6]] == 1.0                                        # back within 7.5% -> restore
+
+
+def _gf_market(cash_final: bool):
+    """One GF contract expiring on D[3] (settles through D[3]), held from D[1]."""
+    m = _market({"G": [(d, 2.0 + 0.01 * i) for i, d in enumerate(D[:4])]},
+                cash_final={("G", D[4]): 2.05} if cash_final else None)
+    m.roots, m.size, m.root_of = ("GF",), {"GF": 50000}, {"G": "GF"}
+    m.px = {"GF": m.px["LE"]}
+    m.ltd = {"G": D[3]}
+    m.dates = list(D)
+    return m
+
+
+def test_gf_closed_at_cash_final_fee_only():
+    m = _gf_market(cash_final=True)
+    res = backtest.run(m, [backtest.Rebalance(D[0], {"GF": ("G", -1.0)})], capital=1e6)
+    close = res.trades[res.trades["reason"] == "cash_final"].iloc[0]
+    assert close["date"] == D[4] and close["price"] == 2.05 and close["cost"] == 2.50
+    assert res.events["gf_cash_final_closes"] == 1
+
+
+def test_gf_closed_at_last_settlement_without_cash_final():
+    m = _gf_market(cash_final=False)
+    res = backtest.run(m, [backtest.Rebalance(D[0], {"GF": ("G", -1.0)})], capital=1e6)
+    close = res.trades[res.trades["reason"] == "ltd_settlement_no_cash_final"].iloc[0]
+    assert close["price"] == pytest.approx(2.03) and close["cost"] == 2.50
+    assert res.events["gf_ltd_settlement_closes"] == 1

@@ -23,7 +23,7 @@ from dataclasses import dataclass, field
 import numpy as np
 import pandas as pd
 
-from src import analysis, contracts, costs, signals, trial_log
+from src import analysis, contracts, costs, margin, signals, trial_log
 from src.config import load_config, oos_start
 
 OVERLAY_TRIGGER, OVERLAY_RESTORE, OVERLAY_SCALE = 0.15, 0.075, 0.5
@@ -50,7 +50,7 @@ class Market:
     def __init__(self, roots: tuple[str, ...], oos: bool = False):
         self.roots = roots
         self.size = {r: load_config()["specs"][r]["size"] for r in roots}
-        self.px, self.cash_final, self.locked = {}, {}, set()
+        self.px, self.cash_final, self.locked, self.has_cash_final = {}, {}, set(), set()
         tbl = contracts.contract_table(oos)
         self.root_of = dict(zip(tbl["contract"], tbl["root"]))
         self.ltd = dict(zip(tbl["contract"], tbl["last_trade_date"]))
@@ -59,6 +59,7 @@ class Market:
             self.px[r] = s[~s["cash_final"]].pivot(index="date", columns="contract", values="price")
             cf = s[s["cash_final"]]
             self.cash_final.update({(c, d): p for c, d, p in zip(cf["contract"], cf["date"], cf["price"])})
+            self.has_cash_final.update(cf["contract"])
             hl = contracts.session_high_low(r, oos)
             hl = hl[hl["high"] == hl["low"]]
             self.locked.update(zip(hl["date"], hl["contract"]))
@@ -93,7 +94,8 @@ def run(market: Market, rebalances: list[Rebalance], capital: float, overlay: bo
     pending_scale = 1.0
     scale, equity, peak = 1.0, 1.0, 1.0
     rows, trades, rb_rows = [], [], []
-    events = {"deferred_days": 0, "deferred_trades": 0, "superseded_orders": 0, "gf_cash_final_closes": 0}
+    events = {"deferred_days": 0, "deferred_trades": 0, "superseded_orders": 0, "gf_cash_final_closes": 0,
+              "gf_ltd_settlement_closes": 0}
     deferred_this_order = False
 
     for d in dates:
@@ -115,6 +117,18 @@ def run(market: Market, rebalances: list[Rebalance], capital: float, overlay: bo
                 del holdings[c], last_px[c]
             elif market.root_of[c] not in contracts.CASH_SETTLED and d > market.ltd[c]:
                 raise RuntimeError(f"held {c} past its last trade date")
+            elif d > market.ltd[c] and c not in market.has_cash_final:
+                # No cash-final record in the feed: close at the last trading-day settlement, fee only
+                # (Deviation Log 2026-10-03 17:39). P&L through that settlement is already booked.
+                root = market.root_of[c]
+                tc = costs.trade_cost(root, q, fee_only=True, cfg=cfg)
+                cost += tc
+                trades.append({"date": d, "signal_date": None, "contract": c, "qty": -q, "price": last_px[c],
+                               "cost": tc, "reason": "ltd_settlement_no_cash_final"})
+                events["gf_ltd_settlement_closes"] += 1
+                del holdings[c], last_px[c]
+            elif d > market.ltd[c] + pd.Timedelta(days=7):
+                raise RuntimeError(f"held cash-settled {c} more than a week past expiry")
 
         # 2) Execute a pending order if every traded contract settles today and none is locked.
         if pending is not None and d > pending.signal_date:
@@ -209,17 +223,71 @@ def variant_a_rebalances(sig: pd.DataFrame, zcol: str, market: Market, capital: 
     return out
 
 
-def backtest_a(zcol: str = "z", overlay: bool = False, kind: str = "trial", spec: str = "primary",
-               sig: pd.DataFrame | None = None, market: Market | None = None,
-               **spec_params) -> tuple[Result, dict]:
-    """Variant A for one spec. Every call is logged to the trial log (kind: trial, diagnostic,
-    overlay). spec_params: sale_min_days, fcr, lookback, seasonal_years (signals.month_end_signals)."""
+def variant_b_rebalances(sig: pd.DataFrame, zcol: str, market: Market, capital: float, bushels: float) -> list[Rebalance]:
+    """U_t = clip(-z_t / 2, -1, 1) x target_vol x capital / sigma$_t head units; one head unit is long
+    W_out lb of the sale LE, short W_in lb of the feeder GF and short B bu of the corn ZC.
+    sigma$_t = annualized sd of one head unit's daily P&L (t-selected contracts, last 60 common
+    settlement dates up to t). No leverage cap (Deviation Log 2026-10-02)."""
+    cfg = load_config()
+    s, m = cfg["sizing"], cfg["margin"]
+    lbs = {"LE": m["w_out_lb"], "GF": -m["w_in_lb"], "ZC": -bushels}       # per head unit, signed
+    out = []
+    for t, row in sig.dropna(subset=[zcol]).iterrows():
+        legs = {"LE": row["sale_contract"], "GF": row["feeder_contract"], "ZC": row["corn_contract"]}
+        px = pd.concat({r: market.px[r][c].loc[:t] for r, c in legs.items()}, axis=1).dropna()
+        unit_pnl = sum(lbs[r] * px[r].diff() for r in legs).dropna().iloc[-s["vol_lookback_days"]:]
+        if len(unit_pnl) < s["vol_lookback_days"]:
+            raise RuntimeError(f"only {len(unit_pnl)} common settlement dates before {t.date()} for sigma$")
+        sigma_usd = unit_pnl.std(ddof=1) * np.sqrt(252)
+        u = float(np.clip(-row[zcol] / s["z_clip_divisor"], -1, 1) * s["target_vol"] * capital / sigma_usd)
+        targets = {r: (c, u * lbs[r] / market.size[r]) for r, c in legs.items()}
+        out.append(Rebalance(signal_date=t, targets=targets, weight=u))
+    return out
+
+
+def variant_c_rebalances(sig: pd.DataFrame, zcol: str, market: Market, capital: float,
+                         hp: pd.DataFrame) -> list[Rebalance]:
+    """Variant A, kept long only if HP_t > its prior-156-week median and short only if HP_t < it;
+    otherwise flat. HP_t is the latest COT report known at t."""
+    out = []
+    for rb in variant_a_rebalances(sig, zcol, market, capital):
+        h = hp.loc[rb.signal_date]
+        if pd.isna(h["hp"]) or pd.isna(h["hp_median_prior"]):
+            raise RuntimeError(f"no hedging-pressure reading at {rb.signal_date.date()}")
+        keep = (rb.weight > 0 and h["hp"] > h["hp_median_prior"]) or (rb.weight < 0 and h["hp"] < h["hp_median_prior"])
+        if not keep:
+            rb = Rebalance(rb.signal_date, {r: (c, 0.0) for r, (c, _) in rb.targets.items()}, weight=0.0)
+        out.append(rb)
+    return out
+
+
+VARIANT_ROOTS = {"A": ("LE",), "B": ("LE", "GF", "ZC"), "C": ("LE",)}
+
+
+def backtest_variant(variant: str, zcol: str = "z", overlay: bool = False, kind: str = "trial",
+                     spec: str = "primary", sig: pd.DataFrame | None = None, market: Market | None = None,
+                     **spec_params) -> tuple[Result, dict]:
+    """One backtest of Variant A, B or C. Every call is logged to the trial log (kind: trial,
+    diagnostic, overlay). spec_params go to signals.month_end_signals (sale_min_days, fcr, lookback,
+    seasonal_years)."""
     capital = load_config()["capital_base"]
     sig = signals.month_end_signals(**spec_params) if sig is None else sig
-    market = Market(("LE",)) if market is None else market
-    res = run(market, variant_a_rebalances(sig, zcol, market, capital), capital, overlay=overlay)
+    market = Market(VARIANT_ROOTS[variant]) if market is None else market
+    if variant == "A":
+        rbs = variant_a_rebalances(sig, zcol, market, capital)
+    elif variant == "B":
+        rbs = variant_b_rebalances(sig, zcol, market, capital, margin.params(fcr=spec_params.get("fcr"))["B"])
+    elif variant == "C":
+        rbs = variant_c_rebalances(sig, zcol, market, capital, signals.hp_at(sig.index))
+    else:
+        raise ValueError(variant)
+    res = run(market, rbs, capital, overlay=overlay)
     m = analysis.metrics(res.daily, "net", capital)
     m["turnover"] = analysis.turnover(res.trades, res.daily, capital)
-    trial_log.log_trial("A", {"zcol": zcol, "overlay": overlay, **spec_params}, (m["start"], m["end"]),
+    trial_log.log_trial(variant, {"zcol": zcol, "overlay": overlay, **spec_params}, (m["start"], m["end"]),
                         m["sharpe"], m["n_days"], m["skew_daily"], m["kurt_daily"], kind=kind, spec=spec)
     return res, m
+
+
+def backtest_a(zcol: str = "z", **kwargs) -> tuple[Result, dict]:
+    return backtest_variant("A", zcol, **kwargs)

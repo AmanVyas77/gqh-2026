@@ -41,6 +41,7 @@ def metrics(daily: pd.DataFrame, col: str = "net", capital: float | None = None)
         "worst_month": m.min(), "worst_month_label": str(m.idxmin()),
         "skew_daily": stats.skew(r), "kurt_daily": stats.kurtosis(r, fisher=False),
         "avg_gross_leverage": daily["gross_notional"].mean() / capital,
+        "max_gross_leverage": daily["gross_notional"].max() / capital,
         "turnover": None,
     }
 

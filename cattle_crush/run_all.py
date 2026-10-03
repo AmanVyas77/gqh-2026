@@ -79,7 +79,11 @@ def main() -> None:
     print("\n[4] Variant A (primary), drawdown overlay, and diagnostics 1b / 2b")
     variant_a(sig)
 
-def plot_equity(curves: dict, path) -> None:
+    print("\n[5] Variants B and C (primary), drawdown overlay, and diagnostic 1b")
+    for v in ("B", "C"):
+        variant_bc(v, sig)
+
+def plot_equity(curves: dict, path, title: str = "Variant A (primary spec), in-sample") -> None:
     """Cumulative return on fixed capital, one line per curve (same units, one axis)."""
     import matplotlib
     matplotlib.use("Agg")
@@ -99,7 +103,7 @@ def plot_equity(curves: dict, path) -> None:
                     textcoords="offset points", va="center", fontsize=9, color="#52514e")
     ax.set_xlim(right=max(r.index[-1] for r in curves.values()) + pd.Timedelta(days=500))
     ax.set_ylabel("Cumulative return, % of capital (no compounding)", color="#52514e")
-    ax.set_title("Variant A (primary spec), in-sample", loc="left", fontsize=11, color="#0b0b0b", pad=26)
+    ax.set_title(title, loc="left", fontsize=11, color="#0b0b0b", pad=26)
     ax.legend(loc="lower left", bbox_to_anchor=(0, 1.0), frameon=False, ncol=4, borderaxespad=0.2)
     fig.savefig(path, dpi=160, bbox_inches="tight", facecolor="#fcfcfb")
     plt.close(fig)
@@ -158,6 +162,56 @@ def variant_a(sig: pd.DataFrame) -> None:
     pd.concat({name: res.daily.set_index("date")[["gross", "net", "net2x"]] for name, (res, _) in runs.items()},
               axis=1).to_parquet(PROCESSED / "variant_a_daily.parquet")
     plot_equity(curves, RESULTS / "figures" / "equity.png")
+
+
+
+def variant_bc(variant: str, sig: pd.DataFrame) -> None:
+    cfg = load_config()
+    capital, lags = cfg["capital_base"], cfg["tests"]["p2_nw_lags"]
+    market = backtest.Market(backtest.VARIANT_ROOTS[variant])
+    runs = {
+        "primary": backtest.backtest_variant(variant, "z", sig=sig, market=market, kind="trial"),
+        "overlay": backtest.backtest_variant(variant, "z", overlay=True, sig=sig, market=market, kind="overlay"),
+        "diag_1b_seasonal_only": backtest.backtest_variant(variant, "z_seasonal_only", sig=sig, market=market,
+                                                          kind="diagnostic", spec="seasonal_only"),
+    }
+    rows = []
+    for name, (res, m) in runs.items():
+        for col in ("net", "gross", "net2x"):
+            mm = analysis.metrics(res.daily, col, capital)
+            rows.append({"run": name, "returns": col, **{k: v for k, v in mm.items() if k != "turnover"},
+                         "turnover": m["turnover"], **res.events})
+    perf = pd.DataFrame(rows)
+    perf.to_csv(RESULTS / "tables" / f"variant_{variant.lower()}.csv", index=False)
+    print(f"Variant {variant}")
+    print(perf[perf["returns"] == "net"][["run", "start", "end", "ann_return", "ann_vol", "sharpe", "max_drawdown",
+                                          "mean_monthly", "nw_t_monthly", "worst_month", "worst_month_label",
+                                          "avg_gross_leverage", "max_gross_leverage", "turnover",
+                                          "deferred_trades", "gf_cash_final_closes", "gf_ltd_settlement_closes"]]
+          .to_string(index=False, float_format=lambda v: f"{v:.4f}"))
+    print(perf[perf["run"] == "primary"][["returns", "ann_return", "sharpe", "mean_monthly", "nw_t_monthly"]]
+          .to_string(index=False, float_format=lambda v: f"{v:.4f}"))
+    prim, seas = runs["primary"][0], runs["diag_1b_seasonal_only"][0]
+    reg = analysis.regress_returns(analysis.monthly(prim.daily.set_index("date")["net"]),
+                                   analysis.monthly(seas.daily.set_index("date")["net"]), lags)
+    w = pd.concat({"a": prim.rebalances.set_index("signal_date")["weight"],
+                   "b": seas.rebalances.set_index("signal_date")["weight"]}, axis=1).dropna()
+    diag = pd.DataFrame([{"diagnostic": "diag_1b_seasonal_only", **reg, "position_corr": w["a"].corr(w["b"]),
+                          "n_rebalances": len(w)}])
+    diag.to_csv(RESULTS / "tables" / f"variant_{variant.lower()}_diagnostics.csv", index=False)
+    print(diag.to_string(index=False, float_format=lambda v: f"{v:.4f}"))
+    if variant == "C":
+        flat = (prim.rebalances["weight"] == 0).mean()
+        print(f"C: share of rebalances flat after the hedging-pressure filter: {flat:.0%}")
+    curves = {"Gross": prim.daily.set_index("date")["gross"], "Net 1x": prim.daily.set_index("date")["net"],
+              "Net 2x": prim.daily.set_index("date")["net2x"],
+              "Overlay, net 1x": runs["overlay"][0].daily.set_index("date")["net"]}
+    PROCESSED.mkdir(parents=True, exist_ok=True)
+    pd.concat({name: res.daily.set_index("date")[["gross", "net", "net2x"]] for name, (res, _) in runs.items()},
+              axis=1).to_parquet(PROCESSED / f"variant_{variant.lower()}_daily.parquet")
+    names = {"B": "Variant B (crush spread, primary spec), in-sample",
+             "C": "Variant C (A filtered by hedging pressure, primary spec), in-sample"}
+    plot_equity(curves, RESULTS / "figures" / f"equity_{variant.lower()}.png", names[variant])
 
 
 if __name__ == "__main__":

@@ -84,3 +84,16 @@ def test_leg_contributions_sum_to_margin_change():
     legs, _ = mechanism.leg_decomposition(signals.month_end_signals())
     parts = legs[["LE (sale value)", "GF (feeder cost)", "ZC (corn cost)"]].sum(axis=1)
     assert (parts - legs["dM (total)"]).abs().max() < 1e-9
+
+
+@pytest.mark.parametrize("asof,known", [
+    ("2019-06-04", "2019-06-10"),   # normal week: Friday release, known Monday (+6)
+    ("2014-12-23", "2014-12-31"),   # Dec 25-26 closures: released Tue 12-30, known Wed (+8)
+    ("2016-11-22", "2016-11-30"),   # Thanksgiving: released Mon, +8 is conservative
+    ("2015-06-30", "2015-07-08"),   # July 3 holiday: released Mon 7-6
+    ("2023-02-07", "2023-03-22"),   # ION incident backlog
+    ("2013-10-08", "2013-11-12"),   # 2013 shutdown backlog
+])
+def test_cftc_known_from(asof, known):
+    got = signals.cftc_known_from(pd.Series([pd.Timestamp(asof)]))
+    assert got.iloc[0] == pd.Timestamp(known)
