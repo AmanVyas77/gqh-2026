@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "data"))
 
 import audit  # noqa: E402
 import download  # noqa: E402
-from src import margin  # noqa: E402
+from src import margin, mechanism, signals  # noqa: E402
 from src.config import PROCESSED, RAW, RESULTS, load_config  # noqa: E402
 
 RAW_FILES = {
@@ -63,6 +63,18 @@ def main() -> None:
           f"B = {daily.attrs['B']:.4f} bu; month-end M_t mean ${m.mean():,.0f}, sd ${m.std():,.0f}, "
           f"range ${m.min():,.0f} to ${m.max():,.0f} per head")
 
+
+    print("\n[3] P1 mechanism test (primary) and pre-declared diagnostics 1a, 2a")
+    sig = signals.month_end_signals()
+    p1 = mechanism.p1(sig, {"primary": ["z"], "diag_1a_seasonally_adjusted": ["z_sa"],
+                            "diag_2a_joint_z_and_z_le": ["z", "z_le"]})
+    (RESULTS / "tables").mkdir(parents=True, exist_ok=True)
+    p1.to_csv(RESULTS / "tables" / "mechanism.csv", index=False)
+    mechanism.plot_p1(sig, RESULTS / "figures" / "mechanism.png")
+    for _, r in p1.iterrows():
+        verdict = f"  -> {'PASS' if r['pass'] else 'FAIL'}" if r["spec"] == "primary" else ""
+        print(f"{r['spec']:30s} {r['regressor']:5s} beta {r['beta']:+.4f}  NW t {r['t_nw']:+.2f}  "
+              f"n {r['n']}{verdict}")
 
 if __name__ == "__main__":
     main()
