@@ -170,3 +170,32 @@ def settlements(root: str, oos: bool = False) -> pd.DataFrame:
 def settle_panel(root: str, oos: bool = False) -> pd.DataFrame:
     """Date x contract matrix of settlement prices."""
     return settlements(root, oos).pivot(index="date", columns="contract", values="price").sort_index()
+
+
+def session_high_low(root: str, oos: bool = False) -> pd.DataFrame:
+    """Official trading-session high and low per contract and trading date, from the statistics
+    schema (stat_type 5 / 4). Only records inside the regular session are used, because the
+    feed also replays session statistics outside trading hours. LE and GF trade a day session
+    (records 08:00-13:30 CT); ZC also trades an overnight session that belongs to the next
+    trading date (records 19:00 CT onward are shifted to the next date; 13:30-19:00 CT dropped)."""
+    cfg = load_config()["databento"]
+    s = _read(f"{root}_statistics.parquet", oos)
+    s = s[s["stat_type"].isin([cfg["session_high_stat_type"], cfg["session_low_stat_type"]])
+          & (s["update_action"] == 1) & (s["price"] > 0)]
+    ct = s["ts_event"].dt.tz_convert(CHICAGO).dt.tz_localize(None)
+    minutes = ct.dt.hour * 60 + ct.dt.minute
+    if root == "ZC":
+        keep = (minutes < 13 * 60 + 30) | (minutes >= 19 * 60)
+        date = (ct + pd.Timedelta(hours=5)).dt.normalize()
+    else:
+        keep = (minutes >= 8 * 60) & (minutes < 13 * 60 + 30)
+        date = ct.dt.normalize()
+    s = s.assign(date=date)[keep]
+    ids = definition_versions(oos).query("root == @root")[["instrument_id", "contract"]].drop_duplicates()
+    s = s.merge(ids, on="instrument_id", how="inner")
+    hi = s[s["stat_type"] == cfg["session_high_stat_type"]].groupby(["date", "contract"])["price"].max()
+    lo = s[s["stat_type"] == cfg["session_low_stat_type"]].groupby(["date", "contract"])["price"].min()
+    out = pd.concat({"high": hi, "low": lo}, axis=1).reset_index()
+    if not oos:
+        out = out[out["date"] < oos_start()]
+    return out
