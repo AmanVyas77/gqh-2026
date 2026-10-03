@@ -1,0 +1,3 @@
+strategy,variant,spec,sharpe_annual,n_obs,skew,kurt,n_trials,raw_logged_rows,trial_rows,var_sharpe_daily,sr0_annual,psr,dsr
+Variant A primary (pre-registered),A,primary,-0.084058,2834,0.527633,10.855628,24,57,26,9.486154022210717e-05,0.3060982018797874,0.38918760241453065,0.09572640123589127
+Best of all trials,B,seasonal_adjust,0.214772,1575,0.186464,12.252751,24,57,26,9.486154022210717e-05,0.3060982018797874,0.7044695160051154,0.4096394697211835

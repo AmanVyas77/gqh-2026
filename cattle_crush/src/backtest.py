@@ -266,23 +266,25 @@ VARIANT_ROOTS = {"A": ("LE",), "B": ("LE", "GF", "ZC"), "C": ("LE",)}
 
 def backtest_variant(variant: str, zcol: str = "z", overlay: bool = False, kind: str = "trial",
                      spec: str = "primary", sig: pd.DataFrame | None = None, market: Market | None = None,
-                     **spec_params) -> tuple[Result, dict]:
+                     oos: bool = False, **spec_params) -> tuple[Result, dict]:
     """One backtest of Variant A, B or C. Every call is logged to the trial log (kind: trial,
-    diagnostic, overlay). spec_params go to signals.month_end_signals (sale_min_days, fcr, lookback,
-    seasonal_years)."""
+    diagnostic, overlay, oos). spec_params go to signals.month_end_signals (sale_min_days, fcr,
+    lookback, seasonal_years). oos=True (run_oos.py only) simulates through the end of the data and
+    reports and logs metrics for dates on or after oos_start."""
     capital = load_config()["capital_base"]
-    sig = signals.month_end_signals(**spec_params) if sig is None else sig
-    market = Market(VARIANT_ROOTS[variant]) if market is None else market
+    sig = signals.month_end_signals(oos=oos, **spec_params) if sig is None else sig
+    market = Market(VARIANT_ROOTS[variant], oos=oos) if market is None else market
     if variant == "A":
         rbs = variant_a_rebalances(sig, zcol, market, capital)
     elif variant == "B":
         rbs = variant_b_rebalances(sig, zcol, market, capital, margin.params(fcr=spec_params.get("fcr"))["B"])
     elif variant == "C":
-        rbs = variant_c_rebalances(sig, zcol, market, capital, signals.hp_at(sig.index))
+        rbs = variant_c_rebalances(sig, zcol, market, capital, signals.hp_at(sig.index, oos=oos))
     else:
         raise ValueError(variant)
-    res = run(market, rbs, capital, overlay=overlay)
-    m = analysis.metrics(res.daily, "net", capital)
+    res = run(market, rbs, capital, overlay=overlay, oos=oos)
+    window = res.daily[res.daily["date"] >= oos_start()] if oos else res.daily
+    m = analysis.metrics(window, "net", capital)
     m["turnover"] = analysis.turnover(res.trades, res.daily, capital)
     trial_log.log_trial(variant, {"zcol": zcol, "overlay": overlay, **spec_params}, (m["start"], m["end"]),
                         m["sharpe"], m["n_days"], m["skew_daily"], m["kurt_daily"], kind=kind, spec=spec)

@@ -1,6 +1,6 @@
 """Append-only log of every backtest run (results/trial_log.csv). Rows are never deleted.
 
-kind: "trial" (counts toward the Deflated Sharpe N), "diagnostic" or "overlay" (logged and
+kind: "trial" (counts toward the Deflated Sharpe N), "diagnostic", "overlay" or "oos" (logged and
 disclosed, not counted; Deviation Log 2026-10-02 / 2026-10-03). Tests point CATTLE_TRIAL_LOG at
 a temporary file so they never write to the real log.
 """
@@ -33,7 +33,7 @@ def _git_commit() -> str:
 
 def log_trial(variant: str, params: dict, sample: tuple, sharpe: float, n_obs: int, skew: float,
               kurt: float, kind: str = "trial", spec: str = "primary") -> None:
-    if kind not in {"trial", "diagnostic", "overlay"}:
+    if kind not in {"trial", "diagnostic", "overlay", "oos"}:
         raise ValueError(f"unknown kind {kind}")
     path = log_path()
     path.parent.mkdir(parents=True, exist_ok=True)

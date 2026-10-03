@@ -1,0 +1,10 @@
+item,root,value,unit,retrieved,source
+daily_price_limit,LE,0.0850,USD/lb,2026-10-03,https://www.cmegroup.com/trading/price-limits.html (Last Updated 10/02/2026; for trade date 2026-10-05)
+expanded_price_limit,LE,0.1275,USD/lb,2026-10-03,https://www.cmegroup.com/trading/price-limits.html (Expanded Price Limits table; 150% of the daily limit)
+maintenance_margin,LE,3000,USD/contract,2026-10-03,https://www.cmegroup.com/markets/agriculture/livestock/live-cattle.margins.html (all listed months)
+maintenance_margin,GF,5400,USD/contract,2026-10-03,https://www.cmegroup.com/markets/agriculture/livestock/feeder-cattle.margins.html (all listed months)
+maintenance_margin,ZC,1050,USD/contract,2026-10-03,https://www.cmegroup.com/markets/agriculture/grains/corn.margins.html (highest listed month: Dec 2026)
+initial_to_maintenance_ratio,ALL,1.10,ratio,2026-10-03,CME Clearing Advisory 16-014 (speculative initial margin = 110% of maintenance) https://www.cmegroup.com/tools-information/lookups/advisories/clearing/files/Chadv16-014.pdf
+federal_spot_month_limit_step1,LE,600,contracts,2026-10-03,17 CFR Part 150 App. E; Position Limits for Derivatives 86 FR 3236 (2021-01-14): from close of the first business day after the first Friday of the contract month
+federal_spot_month_limit_step2,LE,300,contracts,2026-10-03,same: from close of the business day prior to the last five trading days of the contract month
+federal_spot_month_limit_step3,LE,200,contracts,2026-10-03,same: from close of the business day prior to the last two trading days of the contract month

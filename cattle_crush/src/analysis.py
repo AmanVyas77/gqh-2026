@@ -61,3 +61,21 @@ def regress_returns(y: pd.Series, x: pd.Series, lags: int) -> dict:
     return {"n": int(fit.nobs), "alpha": fit.params["const"], "alpha_t": fit.tvalues["const"],
             "beta": fit.params["x"], "beta_t": fit.tvalues["x"], "r2": fit.rsquared,
             "corr": d["y"].corr(d["x"])}
+
+
+EULER_GAMMA = 0.5772156649015329
+
+
+def expected_max_sharpe(var_sr: float, n_trials: int) -> float:
+    """SR0: expected maximum Sharpe among n_trials independent trials with zero true Sharpe and
+    cross-trial variance var_sr (Bailey & Lopez de Prado 2014). Per-period (not annualized) units."""
+    g = EULER_GAMMA
+    return np.sqrt(var_sr) * ((1 - g) * stats.norm.ppf(1 - 1 / n_trials)
+                              + g * stats.norm.ppf(1 - 1 / (n_trials * np.e)))
+
+
+def deflated_sharpe(sr: float, n_obs: int, skew: float, kurt: float, sr0: float) -> float:
+    """Probability that the true Sharpe exceeds sr0 given sample length, skewness and (non-excess)
+    kurtosis. sr0 = 0 gives the Probabilistic Sharpe Ratio; sr0 = expected_max_sharpe gives DSR."""
+    z = (sr - sr0) * np.sqrt(n_obs - 1) / np.sqrt(1 - skew * sr + (kurt - 1) / 4 * sr ** 2)
+    return float(stats.norm.cdf(z))

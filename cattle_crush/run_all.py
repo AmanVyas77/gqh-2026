@@ -16,7 +16,7 @@ import audit  # noqa: E402
 import download  # noqa: E402
 import pandas as pd  # noqa: E402
 
-from src import analysis, backtest, margin, mechanism, signals  # noqa: E402
+from src import analysis, backtest, margin, mechanism, reports, signals  # noqa: E402
 from src.config import PROCESSED, RAW, RESULTS, load_config  # noqa: E402
 
 RAW_FILES = {
@@ -82,6 +82,27 @@ def main() -> None:
     print("\n[5] Variants B and C (primary), drawdown overlay, and diagnostic 1b")
     for v in ("B", "C"):
         variant_bc(v, sig)
+
+    print("\n[6] Robustness: 7 one-at-a-time specs x 3 variants, overlay alongside (logged)")
+    views = reports.robustness_views(reports.run_robustness())
+    views.to_csv(RESULTS / "tables" / "robustness.csv", index=False)
+    reports.plot_robustness(views, RESULTS / "figures" / "robustness.png")
+    net = views[(views["returns"] == "net") & (views["overlay"] == "no_overlay")]
+    print(net.pivot_table(index="spec", columns=["variant", "window"], values="sharpe").round(2).to_string())
+
+    print("\n[7] Deflated Sharpe Ratio")
+    dsr = reports.dsr_report()
+    dsr.to_csv(RESULTS / "tables" / "trials.csv", index=False)
+    print(dsr[["strategy", "sharpe_annual", "n_trials", "raw_logged_rows", "sr0_annual", "psr", "dsr"]]
+          .to_string(index=False, float_format=lambda v: f"{v:.4f}"))
+
+    print("\n[8] Stress tests and liquidity/capital")
+    reports.stress_episodes().to_csv(RESULTS / "tables" / "stress_episodes.csv", index=False)
+    reports.limit_shock().to_csv(RESULTS / "tables" / "stress_limit_shock.csv", index=False)
+    _, by_leg, cap = reports.liquidity_capital()
+    by_leg.to_csv(RESULTS / "tables" / "liquidity_by_leg.csv", index=False)
+    cap.to_csv(RESULTS / "tables" / "capital.csv", index=False)
+    print("written: stress_episodes.csv, stress_limit_shock.csv, liquidity_by_leg.csv, capital.csv")
 
 def plot_equity(curves: dict, path, title: str = "Variant A (primary spec), in-sample") -> None:
     """Cumulative return on fixed capital, one line per curve (same units, one axis)."""
