@@ -1,0 +1,89 @@
+# Every frozen parameter. Mirrors HYPOTHESIS.md (Sections 3-8 and the Section 9 Deviation Log).
+# The SHA-256 of this file is recorded with every trial and in the OOS lock.
+
+data_start: 2010-06-06
+oos_start: 2024-10-01
+capital_base: 1000000
+
+margin:
+  w_in_lb: 800
+  w_out_lb: 1400
+  fcr: 6.0
+  corn_lb_per_bu: 56
+  k_other_cost: 350
+
+contracts:
+  sale_min_days: 150
+  feeder_min_days: 30
+  corn_min_days: 75
+
+specs:   # verify against CME / Databento definitions
+  LE: {size: 40000, unit: lb, tick_cents: 0.025}
+  GF: {size: 50000, unit: lb, tick_cents: 0.025}
+  ZC: {size: 5000,  unit: bu, tick_cents: 0.25}
+
+signal:
+  z_lookback_months: 36
+  seasonal_adjust: false
+  seasonal_years: 5
+
+sizing:
+  target_vol: 0.10
+  vol_lookback_days: 60
+  z_clip_divisor: 2.0
+  max_gross_leverage: 2.0
+
+hedging_pressure:
+  cftc_code_live_cattle: "057642"   # verified 2026-10-02: "LIVE CATTLE - CHICAGO MERCANTILE EXCHANGE"
+  cftc_dataset: "72hh-3qpy"         # Socrata: Disaggregated Commitments of Traders, futures only
+  availability_lag_days: 6          # floor; later of (as-of + 6) and business day after actual release (Deviation Log)
+  median_lookback_weeks: 156
+
+costs:
+  ticks_per_side: 1
+  fee_per_contract_side: 2.50
+  stress_multiplier: 2.0
+
+robustness:   # one parameter at a time around the primary spec
+  z_lookback_months: [24, 48]
+  sale_min_days: [120, 180]
+  fcr: [5.5, 6.5]
+  seasonal_adjust: [true]
+
+tests:
+  p1_nw_lags: 3
+  p1_t_threshold: 2.0     # Deviation Log 2026-10-02
+  p2_nw_lags: 5
+  p2_t_threshold: 2.0
+  p3_nw_lags: 6           # Deviation Log 2026-10-02
+  p3_t_threshold: 2.0     # Deviation Log 2026-10-02
+
+capacity:
+  aum_grid: [1.0e6, 1.0e7, 5.0e7, 1.0e8, 5.0e8, 1.0e9]
+  impact_coef: 1.0
+  adv_lookback_days: 20
+
+# --- Data sources (verified against vendor docs 2026-10-02) ---
+databento:
+  dataset: GLBX.MDP3
+  parents: {LE: LE.FUT, GF: GF.FUT, ZC: ZC.FUT}
+  settlement_stat_type: 3         # statistics schema: settlement price
+  settlement_final_flag: 1        # stat_flags bit 0: final (vs preliminary)
+  session_high_stat_type: 5       # official trading-session high (limit-lock test)
+  session_low_stat_type: 4        # official trading-session low (limit-lock test)
+  price_divisor: 100              # exchange quotes cents/lb and cents/bu -> $/lb and $/bu
+
+nass:
+  # Monthly Cattle on Feed placements, US, feedlots with 1,000+ head capacity.
+  # Series pinned 2026-10-02 from `python data/download.py --probe-nass`: the all-weights total;
+  # equals the sum of the weight-group series (checked for 2023).
+  query:
+    source_desc: SURVEY
+    commodity_desc: CATTLE
+    statisticcat_desc: PLACEMENTS
+    agg_level_desc: NATIONAL
+    freq_desc: MONTHLY
+  short_desc: "CATTLE, ON FEED - PLACEMENTS, MEASURED IN HEAD"
+  domaincat_desc: "CAPACITY: (1,000 OR MORE HEAD)"
+
+spy_ticker: SPY

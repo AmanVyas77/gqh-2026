@@ -1,0 +1,15 @@
+# Secrets
+.env
+
+# Licensed / downloaded data (fetched by data/download.py)
+data/raw/
+data/processed/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# macOS
+.DS_Store
