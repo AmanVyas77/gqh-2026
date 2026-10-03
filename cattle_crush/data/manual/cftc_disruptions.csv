@@ -1,0 +1,5 @@
+event,asof_first,asof_last,known_from,source
+2013 government shutdown,2013-10-01,2013-10-29,2013-11-12,https://www.cftc.gov/PressRoom/PressReleases/6745-13
+2018-19 government shutdown,2018-12-24,2019-03-05,2019-03-18,https://www.cftc.gov/PressRoom/PressReleases/7864-19
+2023 ION cyber incident,2023-01-31,2023-03-14,2023-03-22,https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalSpecialAnnouncements/index.htm
+2025 government shutdown (out-of-sample),2025-09-30,2025-12-16,2025-12-29,https://www.cftc.gov/PressRoom/PressReleases/9147-25
