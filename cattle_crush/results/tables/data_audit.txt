@@ -1,0 +1,48 @@
+Data audit (in-sample, trading dates before 2024-10-01)
+
+== Contract size and tick vs config.yaml ==
+LE: 95 contracts; size [40000.0] LBS, tick $[0.00025] -> matches config (40000, $0.00025); defined with size 0: ['LEM2010']
+GF: 122 contracts; size [50000.0] LBS, tick $[0.00025] -> matches config (50000, $0.00025)
+ZC: 85 contracts; size [5000.0] BU, tick $[0.0025] -> matches config (5000, $0.0025)
+
+== Definition last trade date vs CME rules ==
+LE: 86 expired contracts checked, 0 differ
+GF: 114 expired contracts checked, 0 differ
+ZC: 72 expired contracts checked, 0 differ
+
+== Contracts with more than one published expiry or instrument_id ==
+  GFX2012: id 24087 expiry 2012-11-29 published 2011-11-02..2011-11-17 size 50000; id 24087 expiry 2012-11-15 published 2011-11-19..2012-11-15 size 50000
+  GFX2017: id 6402 expiry 2017-11-30 published 2016-11-02..2016-11-10 size 50000; id 6402 expiry 2017-11-16 published 2016-11-12..2017-11-16 size 50000
+  GFX2018: id 189 expiry 2018-11-29 published 2017-11-02..2017-11-02 size 50000; id 189 expiry 2018-11-15 published 2017-11-05..2018-11-15 size 50000
+  GFX2023: id 60 expiry 2023-11-30 published 2022-11-03..2022-11-03 size 50000; id 60 expiry 2023-11-16 published 2022-11-06..2023-11-16 size 50000
+  ZCN2014: id 214367 expiry 2014-07-14 published 2010-06-28..2010-07-01 size 0; id 640057 expiry 2014-07-14 published 2010-07-03..2014-07-17 size 5000
+
+== Last trading-day settlement vs definition last trade date (expired contracts) ==
+LE: 86 contracts, 1 differ (days) {'LEZ2014': -1}
+GF: 114 contracts, 1 differ (days) {'GFU2014': -3}; GF cash-final records dated the next business day: 90
+ZC: 72 contracts, 0 differ (days) {}
+
+== Dates a product is missing while another product settled ==
+LE: 8 dates ['2012-02-06', '2012-02-07', '2012-02-08', '2012-02-09', '2014-06-12', '2014-09-23', '2014-09-24', '2014-09-25']
+GF: 8 dates ['2012-02-06', '2012-02-07', '2012-02-08', '2012-02-09', '2014-06-12', '2014-09-23', '2014-09-24', '2014-09-25']
+ZC: 2 dates ['2020-02-27', '2020-06-30']
+
+== Settlement cleaning: what each rule removed or changed (outright futures) ==
+root                                               LE            GF        ZC
+settlement records                         149228.000  136847.00000  342582.0
+dropped: null trading date                   1073.000    1054.00000    1903.0
+dropped: price <= 0                           479.000     771.00000     412.0
+contract-days lost (only <=0 prints)          390.000     634.00000     356.0
+contract-days kept                          31957.000   29064.00000   53834.0
+days with disagreeing prints                   30.000      43.00000     148.0
+days where used price != first print           30.000      43.00000     146.0
+largest such correction ($/unit)                2.933       7.30475       1.0
+out-of-range prints                            17.000      18.00000       0.0
+out-of-range prints used                        0.000       0.00000       0.0
+post-2017-05-21 days without a final flag      71.000     121.00000      71.0
+LE prints above $3.0/lb: 16 on ['2015-11-02'], instrument_ids [731, 7780, 13621, 15172, 25444, 108928, 144592, 165581]
+
+== Day-over-day settlement moves above 10% within a contract ==
+LE: 0
+GF: 0
+ZC: 0
