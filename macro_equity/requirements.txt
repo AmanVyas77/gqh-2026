@@ -1,0 +1,6 @@
+# Python 3.11. Pinned to the versions installed for cattle_crush (verified 2026-10-03).
+# Later prompts add only what they use, pinned the same way.
+numpy==2.4.6
+pandas==3.0.6
+PyYAML==6.0.3
+pytest==9.1.1

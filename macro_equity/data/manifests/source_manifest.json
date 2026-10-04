@@ -1,0 +1,118 @@
+{
+  "manifest_version": "0.1",
+  "prepared_et": "2026-10-03T19:35:00-04:00",
+  "feasibility_verdict": "BLOCKED",
+  "note": "Discovery only. No source has been bulk-downloaded into macro_equity/data/ (the pre-registration commit is still pending), so no checksums exist yet. Discovery inspections of a few development-period files were saved only in the session scratchpad, outside the repository. Coverage evidence: data/manifests/coverage_evidence.json (python -m macro_equity.sources.discovery).",
+  "sources": [
+    {
+      "id": "consensus_factset_earnings_insight",
+      "role": "P4 consensus snapshots; P5/P6 matching actuals",
+      "status": "candidate_rejected_for_frozen_design",
+      "provider": "FactSet Research Systems, Earnings Insight (weekly PDF, John Butters)",
+      "urls": [
+        "https://advantage.factset.com/hubfs/Website/Resources%20Section/Research%20Desk/Earnings%20Insight/EarningsInsight_MMDDYY.pdf (2017 onward)",
+        "https://web.archive.org/ captures of http://www.factset.com/websitefiles/PDFs/earningsinsight/earningsinsight_M.D.YY (2011-04 to 2016-12)"
+      ],
+      "retrieved_et": "2026-10-03T19:17/19:30",
+      "coverage": {
+        "report_dates_with_pdf_capture": "454 (Wayback), from 2011-04-01; every month 2011-04..2016-12 and 2022-01..2026-09 has >=1 report (2022-02 none); 2017-2021 nearly absent from Wayback but present on the FactSet host for sampled February dates 2017-2019 (HEAD 200; host rate-limited further probing, HTTP 429)",
+        "per_share_index_eps_chart": "absent 2011-09-30 and 2012-03-30; present from 2012-10-05",
+        "factset_basis_actuals_first_quarter": "Q3 2009 (earliest per-share chart, 2012-10-05)"
+      },
+      "units": "S&P 500 bottom-up EPS per index share (index points)",
+      "definition": "FactSet bottom-up EPS: aggregation of company-level estimates for current constituents (narrative: 'an aggregation of the estimates for all the companies in the index'); actuals on FactSet's basis. Pre-2012 reports use sector share-weighted earnings in $ billions, a different measure",
+      "timestamp_semantics": "Report date printed on each PDF (weekly, normally Friday); prices quoted as of the prior Thursday close; intraday publication time unknown -> would need the conservative rule 'available from the next NYSE session'",
+      "target_quarter": "Calendar quarter explicit in chart labels (e.g. Q116) and narrative; current quarter plus about 4-5 later quarters per report",
+      "vintage_policy": "Each weekly report is a vintage; actuals' first appearance as a solid bar is the first-release vintage (P6a) from 2012-10 only; earlier actuals have no archived publication date",
+      "extraction": "Per-quarter values exist only inside raster chart images; the narrative gives the current quarter's start- and end-of-quarter values only. Requires OCR or manual transcription of about 140 development-period reports",
+      "permissions": "Copyright FactSet, all rights reserved. Terms for systematic extraction not verified; not redistributed in any case",
+      "missingness": "Weeks missing in Wayback (1-5 reports per month captured); 2017-2021 host coverage unverified month by month",
+      "rejection_reason": "Matching actuals start Q3 2009, so the 32-quarter earnings warmup completes only around 2018-Q4 and the 60-month return warmup around late 2023, leaving under 12 development walk-forward months before the holdout. Also image-only values and unverified terms"
+    },
+    {
+      "id": "consensus_spdji_eps_est",
+      "role": "P4/P5 candidate (S&P operating EPS estimates and actuals, matched definition)",
+      "status": "rejected",
+      "provider": "S&P Dow Jones Indices, sp-500-eps-est.xlsx (H. Silverblatt)",
+      "urls": ["https://www.spglobal.com/spdji/en/documents/additional-material/sp-500-eps-est.xlsx and three earlier URLs, via Wayback captures"],
+      "retrieved_et": "2026-10-03T19:29",
+      "coverage": "Distinct archived versions summed across the four URLs (may double count identical files): 2003 4, 2004 5, 2005 14, 2006 11, 2007 6, 2008 0, 2009 2, 2010 1, 2011-2012 0, 2013 1, 2014 7, 2015 26, 2016 3, 2017 10, 2018 3, 2019 1, 2020 2, 2021 5, 2022 11, 2023 8 ...",
+      "rejection_reason": "Snapshots far too sparse for monthly consensus; current file holds only the current vintage. Realized operating EPS history (1988+) is on a different definition from any available dated consensus, so it cannot be combined"
+    },
+    {
+      "id": "consensus_refinitiv_scorecard",
+      "role": "P4 candidate",
+      "status": "rejected",
+      "provider": "LSEG/Refinitiv (I/B/E/S) S&P 500 Earnings Scorecard, Lipper Alpha",
+      "urls": ["https://lipperalpha.refinitiv.com/wp-content/uploads/YYYY/MM/TRPR_*.pdf (Wayback captures)"],
+      "retrieved_et": "2026-10-03T19:29",
+      "coverage": "Archived scorecard PDFs by upload year: 2016 39, 2017 18, 2018 4, 2019 29, 2020 53, 2021 76, 2022 209, 2023 277, 2024 210 ...",
+      "definition": "Growth rates and share-weighted earnings in $ billions (per-share index EPS not confirmed)",
+      "rejection_reason": "History starts 2016 and is sparse until 2022; measure is not confirmed per-share EPS"
+    },
+    {
+      "id": "consensus_fmp_connector",
+      "role": "P4 candidate (existing connected account)",
+      "status": "rejected",
+      "provider": "Financial Modeling Prep connector (analyst/financial-estimates)",
+      "rejection_reason": "Requires a higher paid plan (ACCESS DENIED); per-company current estimates, not dated index snapshots"
+    },
+    {
+      "id": "excluded_by_definition",
+      "status": "not_investigated",
+      "items": ["Yardeni forward 12-month earnings (no fixed target quarter)", "Shiller / multpl (realized only)", "Philadelphia Fed SPF corporate profits (NIPA, not S&P 500 EPS)", "Zacks Earnings Trends (aggregate growth; not investigated within timebox)"]
+    },
+    {
+      "id": "credit_spread_ice_bofa_oas",
+      "role": "P8 credit-spread change",
+      "status": "blocked_on_free_route",
+      "provider": "ICE Data Indices via FRED (BAMLC0A0CM, ICE BofA US Corporate Index OAS)",
+      "urls": ["https://fred.stlouisfed.org/series/BAMLC0A0CM"],
+      "retrieved_et": "2026-10-03T19:26",
+      "units": "percent (daily close)",
+      "coverage": "FRED: 'Starting in April 2026, this series will only include 3 years of observations. For more data, go to the source.'",
+      "permissions": "Proprietary to ICE Data Indices; reproduction requires prior written permission",
+      "rejection_reason": "Decades of OAS history not available free; using archived vintages would circumvent the provider's restriction; a yield-based spread (e.g. Moody's Baa minus Treasury) is a different definition and would need an amendment"
+    },
+    {
+      "id": "real_yield_dfii10",
+      "role": "P7",
+      "status": "usable_pending_download",
+      "provider": "Board of Governors (H.15) via FRED DFII10",
+      "urls": ["https://fred.stlouisfed.org/series/DFII10"],
+      "retrieved_et": "2026-10-03T19:26",
+      "units": "percent, daily",
+      "timestamp_semantics": "H.15 daily; availability lag to be set conservatively (next business day) at download",
+      "coverage": "start date to be confirmed at download"
+    },
+    {
+      "id": "dollar_dtwexbgs",
+      "role": "P10",
+      "status": "usable_pending_download",
+      "provider": "Board of Governors (H.10) via FRED DTWEXBGS",
+      "urls": ["https://fred.stlouisfed.org/series/DTWEXBGS"],
+      "retrieved_et": "2026-10-03T19:26",
+      "units": "index, Jan 2006 = 100, daily",
+      "timestamp_semantics": "Weekly H.10 release (observation for 2026-09-25 updated 2026-09-28; next release 2026-10-05): up to about 10 days' lag",
+      "coverage": "from 2006; predecessor TWEXB discontinued (chaining to be verified)"
+    },
+    {
+      "id": "gdp_alfred",
+      "role": "P9",
+      "status": "usable_pending_download",
+      "provider": "BEA via ALFRED (GDP)",
+      "urls": ["https://alfred.stlouisfed.org/series?seid=GDP"],
+      "retrieved_et": "2026-10-03T19:26",
+      "units": "billions of dollars, SAAR, quarterly",
+      "vintage_policy": "Real-time vintages from 1991-12-04 to 2026-09-30",
+      "timestamp_semantics": "Vintage date = release date (08:30 ET BEA releases); to be verified at download"
+    },
+    {
+      "id": "prices_spy_bil",
+      "role": "P2/P3",
+      "status": "pending_verification",
+      "provider": "yfinance (Databento sponsor equities history does not reach 2007 and corporate actions would need a separate integration; not pursued)",
+      "notes": "BIL inception 2007 (to confirm). yfinance conventions (raw vs adjusted OHLC with auto_adjust=False, dividend and split actions) must be verified against current documentation before any download"
+    }
+  ]
+}

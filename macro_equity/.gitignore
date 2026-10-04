@@ -1,0 +1,20 @@
+# macro_equity only. Patterns are relative to this directory.
+
+# Secrets
+.env
+
+# Raw, licensed and derived-licensed data (never committed)
+data/dev/raw/
+data/dev/processed/
+data/holdout/
+data/imports/
+data/cache/
+
+# Python / tool caches
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# macOS
+.DS_Store

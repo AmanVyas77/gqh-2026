@@ -1,0 +1,174 @@
+# macro_equity specification: machine-readable mirror of HYPOTHESIS.md (section numbers in comments).
+# The SHA-256 of this file will be recorded with every trial and in the holdout lock.
+# Keys listed under provisional_keys stay unresolved until Freeze F1 (end of Prompt 2); each
+# resolution is an amendment row in HYPOTHESIS.md §14, and the amendment ID is noted next to the key.
+
+spec:
+  name: macro_equity
+  version: "0.1"
+  status: provisional            # becomes "frozen" at F1
+  frozen_at_et: null
+  freeze_amendment: null
+  seed: 20261003                 # every randomized procedure (bootstrap) uses this seed
+
+feasibility:                     # Prompt 2 (HYPOTHESIS.md §14 A3; DATA_FEASIBILITY.md)
+  status: BLOCKED                # BLOCKED | FEASIBLE
+  as_of_et: "2026-10-03T19:37:00-04:00"
+  blocking_items: [P4, P5, P6, P8]
+  report: DATA_FEASIBILITY.md
+
+research_log: results/research_log.csv   # append-only; all research attempts (A1), beyond the 6 trial specs
+
+provisional_keys:                # HYPOTHESIS.md §13 register
+  - data.cutoff_date                       # P1
+  - instruments.cash_proxy.selected        # P2
+  - data.price_source                      # P3
+  - calendar.session_calendar_source       # P3
+  - earnings.consensus_source              # P4
+  - earnings.eps_definition                # P5
+  - earnings.realized_source               # P5
+  - earnings.realized_vintage              # P6
+  - macro.real_yield                       # P7
+  - macro.credit_spread                    # P8
+  - macro.gdp                              # P9
+  - macro.dollar                           # P10
+  - macro.publication_lags                 # P7-P10
+  - transforms                             # P11
+  - earnings.warmup_distinct_quarters      # P12
+  - returns.warmup_completed_months        # P12
+  - earnings.inner_validation_min_quarters # P13
+  - returns.inner_validation_min_months    # P13
+  - holdout.n_eligible                     # P14
+  - earnings.target_quarter                # P15
+
+data:                                     # §9
+  cutoff_date: null
+  price_source: null
+  eligible_history: decisions_with_all_primary_inputs_published_through_last_matured_label
+
+calendar:                                 # §3
+  exchange: NYSE
+  timezone: America/New_York
+  decision: last_regular_session_of_month
+  signal_cutoff: scheduled_close          # 16:00, or 13:00 on early-close days
+  execution: next_session_official_open
+  session_calendar_source: null
+
+instruments:                              # §3
+  risky: SPY
+  cash_proxy:
+    preferred: {ticker: BIL, type: traded_etf, legs_per_switch: 2}
+    fallback: {series: 3_month_treasury_bill_rate, type: non_traded_account, legs_per_switch: 1}
+    selected: null
+  allocations: [0, 1]
+  leverage: false
+  shorting: false
+
+labels:                                   # §3
+  return: spy_total_return_minus_cash_total_return_open_to_open
+  horizon: next_execution_open_to_following_execution_open
+  corporate_actions: raw_opens_plus_cash_distributions_reinvested_at_ex_date_open_with_split_factors
+  newest_trainable_label_lag_decisions: 2
+
+earnings:                                 # §4-5
+  target_quarter: calendar_quarter_containing_decision_month
+  eps_definition: null                    # default: index-level operating EPS, consensus provider's basis
+  consensus_source: null                  # must be dated historical snapshots, else BLOCKED
+  realized_source: null
+  realized_vintage: null                  # default: first complete release, else conservative lag
+  training_snapshot: second_month_end_of_target_quarter
+  one_training_example_per_quarter: true
+  features:
+    - nominal_gdp_yoy_growth_latest_published_vintage
+    - broad_dollar_log_change_3_decisions
+    - eps_signed_growth_latest_published_quarter
+  uses_analyst_data: false
+  target: signed_growth_with_floor
+  warmup_distinct_quarters: 32            # minimum; may be raised, never lowered without amendment
+  inner_validation_min_quarters: 20
+
+transforms:                               # P11
+  eps_floor: {k: 0.5, lookback_quarters: 8, statistic: median_abs_published_eps}
+  gap: "(model_eps - consensus_eps) / max(abs(consensus_eps), eps_floor)"
+  growth: "(eps_q - eps_q_minus_4) / max(abs(eps_q_minus_4), eps_floor)"
+  clip_standardized: 4.0
+
+returns:                                  # §6
+  predictors:
+    gap: {source: walk_forward_replay}
+    real_yield_change: {units: bp, window: preceding_decision_to_decision}
+    credit_spread_change: {units: bp, window: preceding_decision_to_decision}
+  primary: {name: combined_additive, inputs: [gap, real_yield_change, credit_spread_change]}
+  diagnostics:
+    earnings_only: [gap]
+    rates_credit_only: [real_yield_change, credit_spread_change]
+    combined_interaction: [gap, real_yield_change, credit_spread_change, gap_x_real_yield_change]
+  benchmark_forecast: expanding_historical_mean
+  warmup_completed_months: 60             # minimum; may be raised, never lowered without amendment
+  inner_validation_min_months: 36
+
+ridge:                                    # §5-6
+  lambdas: [0.1, 1, 10]
+  objective: sum_squared_residuals_plus_lambda_l2
+  intercept_penalized: false
+  standardize: training_mean_sd_ddof0
+  selection: expanding_chronological_validation_mse
+  tie_break: larger_lambda
+  window: expanding
+  refit: every_decision
+
+macro:                                    # candidates; verified in Prompt 2
+  real_yield: null                        # candidate: FRED DFII10
+  credit_spread: null                     # candidate: ICE BofA US Corporate OAS (FRED BAMLC0A0CM)
+  gdp: null                               # candidate: ALFRED GDP vintages
+  dollar: null                            # candidate: FRED DTWEXBGS, chained to DTWEXB before 2006
+  publication_lags: null
+
+portfolio:                                # §7
+  objective: "w * mu_hat - kappa * abs(w - w_current)"
+  cost_per_leg_bps: 5
+  stress_cost_per_leg_bps: 10
+  kappa: cost_per_leg_times_legs_per_switch   # 0.0010 with a traded cash ETF, 0.0005 with a cash account
+  tie_break: retain_current
+  stress_mode: frozen_base_positions          # re-optimized 2x version is a labeled diagnostic, not a trial
+  initial_position: cash_proxy_already_held
+  terminal_valuation: mark_at_final_label_end_open_no_liquidation_cost
+  returns: compounded
+
+benchmarks:                               # §8
+  - spy_buy_and_hold
+  - cash_proxy
+  - trend_12m_spy_tr_vs_cash_tr
+  - constant_mix_development_average_exposure
+
+holdout:                                  # §9
+  fraction: 0.20
+  max_decisions: 24
+  rule: "n_holdout = min(round(fraction * n_eligible), max_decisions); last n_holdout eligible decisions"
+  n_eligible: null
+  n_holdout: null
+  first_holdout_decision: null
+  last_development_decision: null
+  quarantine_inputs_published_after: null
+  quarantine_prices_after_open_of: null
+  inherited_from_other_projects: false
+
+tests:                                    # §10
+  e1: {regression: surprise_on_gap_one_per_quarter, nw_lags: 2, t_threshold: 1.96, sign: positive}
+  e2: {metrics: [mae, rmse], units: index_eps_points, diebold_mariano_nw_lags: 2}
+  r1: {statistic: clark_west, one_sided_t_threshold: 1.645, nw_lags: 3, oos_r2_positive: true}
+  r2: {oos_r2_positive: true}
+  t1: {sharpe_exceeds: spy_buy_and_hold, alpha_nw_lags: 3, alpha_t_threshold: 2.0}
+  t2: {sharpe_exceeds: spy_buy_and_hold}
+
+robustness:                               # §11, development only, primary spec only
+  change_windows_trading_days: [20, 40]
+  cost_multiplier: 2.0
+  subperiods: chronological_halves_by_decision_count
+
+trials:                                   # §11
+  distinct_specs: [S0_primary, D1_earnings_only, D2_rates_credit_only, D3_combined_interaction, R20, R40]
+
+reporting:                                # §12
+  annualization: {daily: 252, monthly: 12}
+  bootstrap: {method: stationary_block, mean_block_months: 6, draws: 2000}
