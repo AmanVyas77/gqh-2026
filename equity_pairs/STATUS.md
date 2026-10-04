@@ -11,7 +11,18 @@ Last updated: 2026-10-03, Prompt 2. Exact timestamps are in `research_log.csv`.
 | 2 — Data audit + development-only feasibility pilot | **Complete. Verdict: NOT PROMISING.** See `DATA_FEASIBILITY.md` |
 | Review gate | **Now.** The specification stops here |
 
-## Verdict
+## V2 amended experiment (2026-10-03; designed after the V1 pilot)
+
+- **Result.** Development backtest from 2015-08-03 to 2024-10-02. **Negative after costs in all three arms:**
+  - simple: −17.0%;
+  - PCA: −12.8%;
+  - sector: −15.5%.
+- **Gross and stress.** Gross returns were close to zero, and doubling costs made every arm worse.
+- **PCA versus the baselines.** PCA lost less than the baselines, but the difference is not statistically distinguishable from zero.
+- **Details.** See `v2/RESULTS_V2.md`.
+- **Holdout.** Still locked (from 2024-10-03). Opening it requires a separate instruction.
+
+## V1 verdict
 
 **NOT PROMISING.**
 
