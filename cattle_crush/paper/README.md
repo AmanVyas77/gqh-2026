@@ -24,3 +24,5 @@ is not the verified build path. Relocated prose and the editorial history are in
 [`../review/editorial_revision/EDITORIAL_NOTES.md`](../review/editorial_revision/EDITORIAL_NOTES.md).
 
 **Funding sensitivity addition:** Section 4 now includes a joint A/B finding explicitly labeled exploratory and post-hoc. Its qualitative direction is independently supported by the packaged minimum NAV/margin ratios; no dated private scratch data, strategy changes or claims of control effectiveness were added. The holdout-access qualification moved to Section 1 and remains intact.
+
+**Submission reproduction update:** Holdout turnover is now reported from a frozen-strategy replay: H1 A 6.3×/yr, H2 9.7×/yr, secondary B 33.3×/yr and C 4.2×/yr. Section 4 documents the one-command reproduction path. The original results and lock remain unchanged; see `../review/reproduction/README.md`.

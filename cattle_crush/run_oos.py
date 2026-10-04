@@ -107,10 +107,17 @@ def evaluate_holdout(cfg: dict) -> tuple[pd.DataFrame, dict]:
             res, _ = backtest.backtest_variant(v, "z", overlay=overlay, kind="oos", spec="primary",
                                                sig=sig, market=market, oos=True)
             win = res.daily[res.daily["date"] >= oos_start()]
+            # Reporting repair: use only executed trades inside the holdout window.
+            # The strategy, signals, fills, costs and return series are unchanged.
+            trades = res.trades
+            trades = trades[(trades["date"] >= win["date"].min()) &
+                            (trades["date"] <= win["date"].max())] if not trades.empty else trades
+            holdout_turnover = analysis.turnover(trades, win, capital)
             role = "PRIMARY (H1)" if v == "A" and not overlay else "secondary (pre-registered)"
             for col in ("net", "gross", "net2x"):
                 rows.append({"hypothesis": "H1", "spec": f"Variant {v}" + (" + overlay" if overlay else ""),
-                             "role": role, "returns": col, **analysis.metrics(win, col, capital)})
+                             "role": role, "returns": col, **analysis.metrics(win, col, capital),
+                             "turnover": holdout_turnover})
             if not overlay:
                 curves[f"H1 Variant {v}"] = res.daily.set_index("date")["net"]
     out = h2.evaluate(log=True, oos=True)
@@ -121,7 +128,8 @@ def evaluate_holdout(cfg: dict) -> tuple[pd.DataFrame, dict]:
                      "n_days": len(out["daily"]), "ann_return": p["ann_return"], "ann_vol": p["ann_vol"],
                      "sharpe": p["sharpe"], "max_drawdown": p["max_drawdown_from_peak"],
                      "mean_monthly": p["mean_monthly"], "nw_t_monthly": p["nw_t_monthly"],
-                     "worst_month": p["worst_month"], "worst_month_label": p["worst_month_label"]})
+                     "worst_month": p["worst_month"], "worst_month_label": p["worst_month_label"],
+                     "turnover": out["exposure"]["turnover_per_year"]})
     curves["H2 primary"] = out["daily_all"].set_index("date")["net"]
     return pd.DataFrame(rows), curves
 

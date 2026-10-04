@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "purpose": "Required files and SHA-256 baselines for verify_submission.py. Paper hashes explicitly updated for reporting-only integration on 2026-10-04; protected/code baselines unchanged. The verifier only reads this manifest.",
+ "purpose": "Required files and SHA-256 baselines. Original protected artifacts preserved; reporting-only run_oos turnover repair and reproduction additions explicitly recorded on 2026-10-04.",
  "required": [
   ".env.example",
   "CLAUDE.md",
@@ -106,7 +106,16 @@
   "tests/test_signals.py",
   "tests/test_verify_submission.py",
   "verify_submission.py",
-  "review/risk_methodology_assessment.md"
+  "review/risk_methodology_assessment.md",
+  "reproduce_submission.py",
+  "tests/test_reproduce_submission.py",
+  "review/reproduction/README.md",
+  "review/reproduction/report.json",
+  "review/reproduction/oos_performance_reproduced.csv",
+  "review/reproduction/trial_log.csv",
+  "review/reproduction/run_all.py.log",
+  "review/reproduction/run_oos.py.log",
+  "tests/test_holdout_turnover_reporting.py"
  ],
  "hashes": {
   "protected": {
@@ -157,7 +166,7 @@
    }
   },
   "code": {
-   "scope": "signal/backtest/analysis code, data scripts, dependency pins and original tests as committed at 240c27c (unchanged since holdout-lock commit 58d6299)",
+   "scope": "Frozen signal/backtest/analysis modules, data scripts, dependency pins and original tests; run_oos.py has a disclosed reporting-only turnover repair (no strategy changes).",
    "files": {
     ".env.example": "e7560649a88a4aa65e18b63c3d09acfe680b3a66d858a384abe9152c28755fa8",
     "conftest.py": "6bfed9ac1d81e6e6ec4fad82598af8e2945f1cfc0ca09dfe76895934e33056a2",
@@ -169,7 +178,7 @@
     "requirements-note.txt": "ebee910ae2849d632f35eb64edfca55411cb69c9f05d76439fac56e23fdecb50",
     "requirements.txt": "0bac64fece9beedee8624169937f906e480de1da70b55b9b1a959dd7d4668859",
     "run_all.py": "c8805f26fcea95d5d9ed86742139444e6e701cb61689738620e06b62bebdc2a1",
-    "run_oos.py": "920e5983ea110e7506fa0b02efdaea950598db83a2a294ae2b2275f487675df1",
+    "run_oos.py": "ceab19e036366cf620297d6ff7b48d3ea56f96877afa52ced061c4b4949ac373",
     "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "src/analysis.py": "47a5462ead94586198ab2b7bfde783a736a0ef4a39cec060fe6f26d574f3dd15",
     "src/backtest.py": "87827e542ccf6f8ee8e6a1060332258f1e120867f3446001dbffd934287b00a5",
@@ -192,18 +201,18 @@
    }
   },
   "paper": {
-   "scope": "current note updated 2026-10-04: prospective governance, corrected overlay rounding and packaged verifier reference; chart and renderer unchanged; exploratory post-hoc funding sensitivity added",
+   "scope": "Current note, formatting QA and unchanged chart/renderer; turnover recovered by frozen replay, reproduction path disclosed on 2026-10-04.",
    "files": {
-    "paper/research_note_edited.pdf": "64dcad897bc70532c4159b681d724c38fbfaaea9a3823a1b9cf0ebeceeb8811b",
-    "paper/research_note_edited.html": "a3c69b0e981197f0c76420654cc4eb9a49b2a84b5e0c22c6cac2edf33e5b6dfe",
+    "paper/research_note_edited.pdf": "94d30edf9f937ab336b03d866c0f7bf197819051ee0fe170c515db4a946948c7",
+    "paper/research_note_edited.html": "b33e6e7373d74c8688fb2caec78341fbc35cb2130fc43637d513dede6d78b5e6",
     "paper/build_note.py": "0cc9912c39ba6db6fa115f482698b65086d179a606a93d0c26f2638317fbb9bc",
     "paper/archived_equity.png": "988f506b3bff2f9be775a41a97bf5428ab5af9d333378448ab1a6365802ec55a",
     "paper/archived_equity_relabeled.png": "b7b249e192dcc481d6a64016fdc36804df1e745f8820059c2150660299575575",
-    "paper/verification.json": "92bc130dfc3db42525d8baa4fcaa69224f452f072279e1eaafcab41cb8262180"
+    "paper/verification.json": "0d17288e93a708cfdccc4ee0b444ef5f84dfd8ae9f9e0db5af2593145054a088"
    }
   },
   "post_evaluation": {
-   "scope": "post-evaluation review tables and reports copied unchanged from the review checkout on 2026-10-04; qualitative risk assessment added during paper integration",
+   "scope": "Post-evaluation review, reproduction driver/evidence, and recovered turnover; original protected artifacts preserved.",
    "files": {
     "review/corrected/tables/h2_risk_current_nav.csv": "bb3dce67ffd1c71b8a4e696502c1a928e951c2e351eb894e0bf2b585d92fa122",
     "review/corrected/tables/order_participation_summary.csv": "3d24180f3c3b518a1e8bf2c8c752cfd67c233948dd7dc677aa0430d29c1b72cb",
@@ -223,7 +232,16 @@
     "review/extension/tables/uncertainty.csv": "9532a088ce461c8c2437e61331eb60a19d9766390da5c89a71814b4cba82e282",
     "review/extension/tables/volume_variability.csv": "15ecb088da522a042cfcad48cc0d24a1bc926a77362a1efb59363dd27006cc91",
     "review/regulatory_check.md": "6a408da9be3831be5b68f3e91da4928e98f7171f4389a55fdc5cbc1c7bd786cd",
-    "review/risk_methodology_assessment.md": "65d2d68f2b9d91a3911a651d3669f68a5de1a820a541dfda1da023ed838aaec0"
+    "review/risk_methodology_assessment.md": "65d2d68f2b9d91a3911a651d3669f68a5de1a820a541dfda1da023ed838aaec0",
+    "reproduce_submission.py": "ffc14b89e3c71d3e0053fdaf8877876261bc5fa67411fbe23182f3e646238a98",
+    "tests/test_reproduce_submission.py": "d3b5e5a20d3be40e1f226a3f22f77f2a89cc34b2cd98439727b8ed17181afa2d",
+    "review/reproduction/README.md": "3e447077200a3261b762e3a7892675b857927136fb61f190a666e92cfb5dc8c0",
+    "review/reproduction/report.json": "e843ff1ceef61452a9254597cfc6de3686a2ca2b5a5a015ceee9f0bb52814861",
+    "review/reproduction/oos_performance_reproduced.csv": "69badeb070e9b65948cc9828f6678ad23da268c0155bf8936dbf80ce3b30ce9f",
+    "review/reproduction/trial_log.csv": "081d9dac0097300bb99e432f98433809262f1635603a0ab9739ba507147d435b",
+    "review/reproduction/run_all.py.log": "6e10c2a99ac4b1c53f84edcd87b3f415226e65c0bffa9033644c5aed6cd73131",
+    "review/reproduction/run_oos.py.log": "18f9360ed2cf2dbd5fac3557514fa16b17d3df4da8191803fb20f2cdde1e67ac",
+    "tests/test_holdout_turnover_reporting.py": "8c45d0b53afaa6d67d4bc29772b572a087362fb1c764dd30316717e098428ea6"
    }
   }
  },
@@ -249,5 +267,10 @@
   "review/extension/REPORT.md",
   "review/regulatory_check.md",
   "review/risk_methodology_assessment.md"
- ]
+ ],
+ "reporting_repair": {
+  "file": "run_oos.py",
+  "original_sha256": "920e5983ea110e7506fa0b02efdaea950598db83a2a294ae2b2275f487675df1",
+  "reason": "Report existing H2 turnover and H1 executed-notional turnover within holdout; preserve strategy and original result artifacts."
+ }
 }

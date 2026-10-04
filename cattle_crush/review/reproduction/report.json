@@ -1,0 +1,218 @@
+{
+  "started_utc": "2026-10-04T14:50:29.097636+00:00",
+  "status": "PASS",
+  "scope": "Full development and frozen-holdout pipelines, empty derived-data cache, existing licensed raw inputs; no new tuning or data download. Original results and lock preserved.",
+  "numeric_tolerance": {
+    "relative": 1e-09,
+    "absolute": 1e-11
+  },
+  "excluded_comparison_columns": {
+    "trials.csv": [
+      "raw_logged_rows",
+      "trial_rows_including_repeats"
+    ],
+    "h2_dsr.csv": [
+      "raw_logged_rows",
+      "trial_rows_including_repeats"
+    ],
+    "oos_performance.csv": [
+      "turnover (recovered reporting omission)"
+    ]
+  },
+  "input_sha256": {
+    "LE_definition.parquet": "f42820052d9f10974c8ec6e9829cbcaa31d0c342857661fc054fe62d33fdb75c",
+    "LE_statistics.parquet": "12f3aeb0b3401ce1a8f1bb7c2704d586b887e469c05c6f05a11acec38fef395e",
+    "LE_ohlcv1d.parquet": "e611a5f7b54b98d9cd0ca5a3701eb6f2b525c25a4f8e14226c667824a2d968ae",
+    "GF_definition.parquet": "8201c1be47a67c4d8876afa7aa4750618226aa4808fd39a724ffc6176e6954ab",
+    "GF_statistics.parquet": "2c004bb7421b6e8d31cbf762a4847098e90aa3c8daba237f506bc1436620f865",
+    "GF_ohlcv1d.parquet": "cb7acd59121f5393a2d73b9f80f3e4f934111b3cefe10a521464dc26100a2e5a",
+    "ZC_definition.parquet": "fcb5ac2bd84c99df839ba2b6167deaa1241ff71e23dae21cfe4953603f8b6e13",
+    "ZC_statistics.parquet": "8b9aacdb3f2ac344909e6af8d93f1971c4d317ffa9c3c3b25395c5ee76633322",
+    "ZC_ohlcv1d.parquet": "d9f81749e609f832a382427a70d41235df88fdf42449b688af257552622638aa",
+    "h2_equities.parquet": "291d7ecb7cd2f0b02681f7f372f1fe86879af91247a7d0c825843a37de84ad24",
+    "nass_placements.parquet": "ce7922850be1803b31da42b91d981ce79c076eb991a1f5fdbd68695bb69a8f70",
+    "cftc_live_cattle.parquet": "0b7ffdda0627e07bba533abec69d592a7c914e1aed8e14898f4d4cf43ce9d843",
+    "spy.parquet": "b8a9a1c472f592abdc60a9aab2313acb3019f9528f782636063ea3b2b4bb7889",
+    "oos/LE_definition.parquet": "635b80fd4adf593c7e54f5570c5ed5f5928cc7e1cd19f802fbb648c2c9943690",
+    "oos/LE_statistics.parquet": "ea8a5b5dff05250739ad0c6a2d95b6466acb46f2e6119270e234c86baa0b1728",
+    "oos/LE_ohlcv1d.parquet": "3f4fa66b0a1915411d30e9963ad56a02abf2d2fd3457f37a9ef7ecca03e4a4c2",
+    "oos/GF_definition.parquet": "1c0821859a5a8e0d941577caee2b61cdb24c6bc94ee1501c4551177d7b79f440",
+    "oos/GF_statistics.parquet": "bea463f6fd4ae09a13ce8ae0123f5de96f8368e2880e087b75406205867b2dc5",
+    "oos/GF_ohlcv1d.parquet": "fdb455e0751c52a3ce7e9f56db1309c9342689b8a5a966e912006681b8121d93",
+    "oos/ZC_definition.parquet": "0aefbbd62880bf7c3921f25df824463d3d1a61e408adea525eb377cb96e604f9",
+    "oos/ZC_statistics.parquet": "caf67f6ea8be6ce493b4b37c1424beb7ccb563aab167e3f885f7c33ac3d380eb",
+    "oos/ZC_ohlcv1d.parquet": "e2f546006c3c2e6004aace7f29ef6258868f54272b6d977e7dc9f59c9282464e",
+    "oos/h2_equities.parquet": "80d34392e1ec80b8aab373cff6ad943f1ef251522b9e9be716bced402e1b79a4",
+    "oos/cftc_live_cattle.parquet": "1cc3981b1963c818f56b6a9f4f4d558ff16e2155acc34fd3f1cd529c164e0a93"
+  },
+  "source_sha256": {
+    "run_all.py": "c8805f26fcea95d5d9ed86742139444e6e701cb61689738620e06b62bebdc2a1",
+    "run_oos.py": "ceab19e036366cf620297d6ff7b48d3ea56f96877afa52ced061c4b4949ac373",
+    "reproduce_submission.py": "ffc14b89e3c71d3e0053fdaf8877876261bc5fa67411fbe23182f3e646238a98",
+    "config.yaml": "ef37283b9a3362b5c1749b3cff858a51d9ad511936955b1a650703ca0c80fb51",
+    "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/analysis.py": "47a5462ead94586198ab2b7bfde783a736a0ef4a39cec060fe6f26d574f3dd15",
+    "src/backtest.py": "87827e542ccf6f8ee8e6a1060332258f1e120867f3446001dbffd934287b00a5",
+    "src/config.py": "6ecf3fce52ddc2bb2cc23ebc1709c5e0d1b5562c92b676ea72ca5217929b8620",
+    "src/contracts.py": "d526b5b9e643922a4ecf605c7c74e7130e49d1d13b7fea911068a179705a5d5e",
+    "src/costs.py": "5d1695b96951325801fdc024befaf5690068b0ce21e4aa581db832f06f061723",
+    "src/h2.py": "f8f703a5e8fd5b2f6c361edf1900c61334b22e7fdd06eb22c5af2d2269f3205b",
+    "src/margin.py": "a07143df992cf967af96df49eace4da127d9eed29fe78ccec61c8167b9fd9d54",
+    "src/mechanism.py": "af37ceb336b52c74554de044af48193678637a112fb62813e2b39db343cc4817",
+    "src/reports.py": "aece557e4f0a72baeb8e1afdd4d281d90578c893c74ace0340a1c452bf45fd84",
+    "src/signals.py": "3a4558a327c427622ac37f93336cf35085b2ac326f5fa3e595312e84adcc7b69",
+    "src/trial_log.py": "ec35ed9fdcd3932d0865617d27a7d57035ea229d5a6002fc23b22bdb66b9f620"
+  },
+  "python": "3.11.7 (main, Dec 15 2023, 12:09:56) [Clang 14.0.6 ]",
+  "packages": {
+    "databento": "0.87.0",
+    "matplotlib": "3.11.2",
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "pytest": "9.1.1",
+    "python-dotenv": "1.2.4",
+    "PyYAML": "6.0.3",
+    "requests": "2.34.2",
+    "scipy": "1.17.1",
+    "statsmodels": "0.15.0",
+    "yfinance": "1.7.0"
+  },
+  "commands": [
+    {
+      "script": "run_all.py",
+      "exit_code": 0
+    },
+    {
+      "script": "run_oos.py",
+      "exit_code": 0
+    }
+  ],
+  "comparisons": [
+    {
+      "file": "by_year.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "capacity_curve.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "capital.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "factors.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "h1_accounting.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "h2_annual.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "h2_dsr.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "h2_performance.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "h2_stress_episodes.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "h2_tests.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "legs.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "liquidity_by_leg.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "mechanism.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "oos_performance.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "robustness.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "stress_episodes.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "stress_limit_shock.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "trials.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "variant_a.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "variant_a_diagnostics.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "variant_b.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "variant_b_diagnostics.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "variant_c.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "variant_c_diagnostics.csv",
+      "status": "PASS",
+      "differences": []
+    },
+    {
+      "file": "h2_exposure_concentration.json",
+      "status": "PASS"
+    }
+  ],
+  "finished_utc": "2026-10-04T14:53:59.011296+00:00"
+}

@@ -16,9 +16,9 @@ cd cattle_crush
 python verify_submission.py
 ```
 
-This verifies artifact hashes, maps 55 numbers in the note to saved result rows, confirms the registered
-decisions and trial accounting, and reports missing holdout turnover as missing. It is an artifact
-check, not a backtest rerun. Full development reproduction (`python run_all.py`) needs licensed
+This verifies artifact hashes, maps the numerical claims in the note to saved result rows, confirms the registered
+decisions and trial accounting, and checks recovered holdout turnover against a frozen-strategy replay. It is an artifact
+check, not a backtest rerun. Full development and holdout reproduction (`python reproduce_submission.py` from `cattle_crush/`) needs licensed
 Databento data and API keys; see [`cattle_crush/README.md`](cattle_crush/README.md) for setup,
 dependencies (`cattle_crush/requirements.txt`, Python 3.11), data acquisition and limitations.
 

@@ -23,16 +23,18 @@ python verify_submission.py
 ```
 
 Python 3.9+ standard library only: no install, no credentials, no network, no market data. It checks the
-hashes of the frozen specifications, saved results, trial log and holdout lock; checks that 55 numerical
+hashes of the frozen specifications, saved results, trial log and holdout lock; checks the numerical
 claims in the note (`submission/claims.json`: source file, row selector, column, units, rounding) match
 the saved rows and the editable note; recomputes the registered pass/fail conditions from saved tables
-and confirms both decisions remain **rejected**; reconciles the trial log; and reports holdout turnover as
-**missing**. It prints a report, writes `submission/verification_report.json`, and exits 1 on any missing
+and confirms both decisions remain **rejected**; reconciles the trial log; and checks the recovered holdout turnover and the saved reproduction report. It prints a report, writes `submission/verification_report.json`, and exits 1 on any missing
 or inconsistent required artifact. If PyMuPDF happens to be installed, it also checks the values in the
 PDF text and the minimum font size.
 
-**What it does not prove:** that the code regenerates these tables. That computational reproduction
-needs the licensed inputs below and the pinned environment; it was not performed by this command.
+**What this artifact command does not do:** rerun the backtests. For computational reproduction, use
+`python reproduce_submission.py` after the setup and data-acquisition steps below. It runs both the
+development pipeline and frozen holdout in an isolated copy with empty derived caches, then compares
+the regenerated tables. It preserves original results, configuration, holdout lock and trial log.
+See [`review/reproduction/README.md`](review/reproduction/README.md) for the recorded result and scope.
 Tests for the verifier: `python -m unittest discover -s tests -p "test_verify_submission.py"`.
 
 | File | Purpose |
@@ -75,7 +77,7 @@ cp .env.example .env        # then add DATABENTO_API_KEY and NASS_API_KEY
 ```bash
 python data/download.py --estimate          # free: prints the Databento cost, buys nothing
 python data/download.py --pull all --yes    # buys the in-sample Databento data; NASS, CFTC, SPY, H2 equities
-python run_all.py                           # about 1 minute once data is present
+python run_all.py                           # several minutes from an empty derived-data cache
 python -m pytest tests/ -q
 pip install -r requirements-note.txt && python note/build_note.py   # optional: rebuild the note PDF
 ```
@@ -141,11 +143,14 @@ remains rejected under the pre-registered decision table. A two-year Sharpe has 
 0.7, so +0.63 is not statistically distinguishable from zero.
 
 `python run_oos.py` now only reproduces this evaluation, and only while `config.yaml` matches the lock.
-It needs the holdout-window licensed data; it was not rerun for any later audit or supplement.
+It needs the holdout-window licensed data. The submission reproduction replays it with the existing lock
+and unchanged strategy, adding only the omitted turnover output. This is not a new tuned experiment.
 
 Holdout max drawdown for H1 is the saved fraction 0.054466625142137515, shown as 5.4% at one decimal
-(earlier versions of this README showed 5.5%). **Holdout turnover is missing**: no holdout trade ledger
-was saved, the `turnover` column of `results/tables/oos_performance.csv` is blank, and it is not inferred.
+(earlier versions of this README showed 5.5%). **The original holdout table omitted turnover.** A reporting-only replay recovers it in
+`review/reproduction/oos_performance_reproduced.csv`; the original table remains byte-for-byte intact.
+H1 uses executed trade notional inside the holdout divided by fixed capital and elapsed years; H2 uses
+its existing holdout `traded`-notional calculation. No signal, fill, cost or selection rule changed.
 
 ## Original results, post-evaluation material and errata
 
@@ -162,3 +167,20 @@ was saved, the `turnover` column of `results/tables/oos_performance.csv` is blan
   uses the same 25 configurations. Post-evaluation reproduction rows were kept in a separate review log
   that is not part of this repository.
 - **Reporting correction:** the supplemental A + overlay development drawdown is now 20.6%, directly rounded from the saved fraction. The paper also summarizes the prospective four-scenario [risk assessment](review/risk_methodology_assessment.md); no financial effectiveness is claimed. Details in [`paper/README.md`](paper/README.md).
+
+## One-command computational reproduction
+
+After installing `requirements.txt` and obtaining all development and holdout raw inputs:
+
+```bash
+python reproduce_submission.py
+```
+
+The command refuses missing data and mismatched dependency versions; it does not download or buy data.
+For a fresh clone, acquire development data as above, then use `python run_oos.py` to see the missing
+holdout-data estimate; `python run_oos.py --yes` authorizes that purchase and replays the existing lock.
+Keep the submitted original artifacts intact by doing data acquisition in a separate clone, then
+place the licensed inputs under this clone's ignored `data/raw/` directory.
+Reproduction records input hashes, source hashes, package versions, command exit codes and per-table
+comparisons in `review/reproduction/report.json`, plus a separate replay trial log.
+This verifies the original backtest tables, not every later qualitative or corrected review supplement.

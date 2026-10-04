@@ -1,0 +1,10 @@
+hypothesis                spec                       role      start        end  ann_return  ann_vol  sharpe  max_drawdown  mean_monthly  nw_t_monthly
+        H1           Variant A               PRIMARY (H1) 2024-10-01 2026-10-02      0.0388   0.0613  0.6331        0.0545        0.0031        0.9660
+        H1 Variant A + overlay secondary (pre-registered) 2024-10-01 2026-10-02      0.0132   0.0417  0.3163        0.0571        0.0011        0.5370
+        H1           Variant B secondary (pre-registered) 2024-10-01 2026-10-02      0.0803   0.0931  0.8630        0.0654        0.0064        1.4015
+        H1 Variant B + overlay secondary (pre-registered) 2024-10-01 2026-10-02      0.0402   0.0465  0.8630        0.0351        0.0032        1.4015
+        H1           Variant C secondary (pre-registered) 2024-10-01 2026-10-02      0.0214   0.0503  0.4260        0.0563        0.0017        0.8045
+        H1 Variant C + overlay secondary (pre-registered) 2024-10-01 2026-10-02      0.0107   0.0251  0.4260        0.0293        0.0009        0.8045
+        H2             primary               PRIMARY (H2) 2024-10-01 2026-10-02     -0.0103   0.0673 -0.1537        0.0757       -0.0008       -0.2673
+P2 holdout condition (H1 Variant A net Sharpe > 0): +0.633 -> met
+Q3 holdout condition (H2 primary net Sharpe > 0): -0.154 -> not met

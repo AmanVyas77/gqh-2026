@@ -160,11 +160,23 @@ class VerifierTests(unittest.TestCase):
         detail = next(c['detail'] for c in report['checks'] if c['id'] == 'holdout.turnover_missing')
         self.assertIn('reported as zero', detail)
 
-    def test_missing_turnover_stays_null(self):
+    def test_recovered_turnover_fills_headline_without_changing_original(self):
         report, _ = self.run_verify()
-        self.assertIsNone(report['missing_metrics'][0]['value'])
+        self.assertEqual(report['missing_metrics'], [])
         holdout = [h for h in report['headline'] if h['period'] == 'holdout']
-        self.assertTrue(holdout and all(h['turnover'] is None for h in holdout))
+        self.assertTrue(holdout and all(h['turnover'] is not None and h['turnover'] >= 0 for h in holdout))
+
+    def test_recovered_turnover_must_be_finite(self):
+        self.edit_csv('review/reproduction/oos_performance_reproduced.csv',
+                      {'hypothesis': 'H1', 'spec': 'Variant A', 'returns': 'net'}, 'turnover', 'nan')
+        report, st = self.run_verify()
+        self.assertEqual(st['holdout.turnover_recovered'], 'fail')
+
+    def test_replay_cannot_change_original_returns(self):
+        self.edit_csv('review/reproduction/oos_performance_reproduced.csv',
+                      {'hypothesis': 'H1', 'spec': 'Variant A', 'returns': 'net'}, 'sharpe', '9.9')
+        report, st = self.run_verify()
+        self.assertEqual(st['holdout.turnover_recovered'], 'fail')
 
     def test_blank_value_is_not_read_as_zero(self):
         store = vs.Store(self.root)

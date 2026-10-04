@@ -6,7 +6,7 @@
   {
    "id": "required_files",
    "status": "pass",
-   "detail": "105/105 present"
+   "detail": "114/114 present"
   },
   {
    "id": "hashes.protected",
@@ -16,17 +16,17 @@
   {
    "id": "hashes.code",
    "status": "pass",
-   "detail": "30/30 match (signal/backtest/analysis code, data scripts, dependency pins and original tests as committed at 240c27c (unchanged since holdout-lock commit 58d6299))"
+   "detail": "30/30 match (Frozen signal/backtest/analysis modules, data scripts, dependency pins and original tests; run_oos.py has a disclosed reporting-only turnover repair (no strategy changes).)"
   },
   {
    "id": "hashes.paper",
    "status": "pass",
-   "detail": "6/6 match (current note updated 2026-10-04: prospective governance, corrected overlay rounding and packaged verifier reference; chart and renderer unchanged; exploratory post-hoc funding sensitivity added)"
+   "detail": "6/6 match (Current note, formatting QA and unchanged chart/renderer; turnover recovered by frozen replay, reproduction path disclosed on 2026-10-04.)"
   },
   {
    "id": "hashes.post_evaluation",
    "status": "pass",
-   "detail": "19/19 match (post-evaluation review tables and reports copied unchanged from the review checkout on 2026-10-04; qualitative risk assessment added during paper integration)"
+   "detail": "28/28 match (Post-evaluation review, reproduction driver/evidence, and recovered turnover; original protected artifacts preserved.)"
   },
   {
    "id": "paper.not_superseded",
@@ -51,12 +51,12 @@
   {
    "id": "paper.required_statements",
    "status": "pass",
-   "detail": "12/12 decision/labelling statements present"
+   "detail": "11/11 decision/labelling statements present"
   },
   {
    "id": "paper.cited_files",
    "status": "pass",
-   "detail": "9 repository paths cited by the note; all present or explicitly excluded"
+   "detail": "11 repository paths cited by the note; all present or explicitly excluded"
   },
   {
    "id": "claims.evidence_labels",
@@ -66,7 +66,7 @@
   {
    "id": "claims.values_and_note",
    "status": "pass",
-   "detail": "55/55 claims match saved rows and the editable note"
+   "detail": "58/58 claims match saved rows and the editable note"
   },
   {
    "id": "roles.holdout_lock",
@@ -111,7 +111,17 @@
   {
    "id": "holdout.turnover_missing",
    "status": "pass",
-   "detail": "turnover blank in all 21 holdout rows; reported as MISSING, never zero"
+   "detail": "original turnover blank in all 21 rows; preserved, never replaced with zero"
+  },
+  {
+   "id": "holdout.turnover_recovered",
+   "status": "pass",
+   "detail": "21 replay rows have finite turnover; original return metrics unchanged within tolerance"
+  },
+  {
+   "id": "reproduction.recorded_run",
+   "status": "pass",
+   "detail": "Saved isolated reproduction report passes and its source hashes match; this verifier does not rerun it"
   },
   {
    "id": "h2.pair_attribution",
@@ -126,7 +136,7 @@
   {
    "id": "paper.pdf_text",
    "status": "pass",
-   "detail": "skipped: PyMuPDF not installed (optional); HTML-to-PDF correspondence rests on the hashed pair and build_note.py"
+   "detail": "PyMuPDF: 6 pages, minimum text size 11.0 pt; every claimed display value found in PDF text"
   }
  ],
  "headline": [
@@ -260,7 +270,7 @@
    "ann_vol": 0.0612840999298093,
    "sharpe": 0.6331158084088536,
    "max_drawdown": 0.054466625142137515,
-   "turnover": null
+   "turnover": 6.2682803590262175
   },
   {
    "label": "H1 Variant A, gross",
@@ -272,7 +282,7 @@
    "ann_vol": 0.06128991788627176,
    "sharpe": 0.6480070234035379,
    "max_drawdown": 0.05414593247790711,
-   "turnover": null
+   "turnover": 6.2682803590262175
   },
   {
    "label": "H1 Variant A, 2x costs",
@@ -284,7 +294,7 @@
    "ann_vol": 0.0612800404261666,
    "sharpe": 0.6182040256787078,
    "max_drawdown": 0.05478811511121506,
-   "turnover": null
+   "turnover": 6.2682803590262175
   },
   {
    "label": "H1 Variant A + overlay, net",
@@ -296,7 +306,7 @@
    "ann_vol": 0.04168571741380532,
    "sharpe": 0.3162896544219084,
    "max_drawdown": 0.05706618861974744,
-   "turnover": null
+   "turnover": 3.9833382483119646
   },
   {
    "label": "H1 Variant B, net",
@@ -308,7 +318,7 @@
    "ann_vol": 0.09307702090756964,
    "sharpe": 0.8630399483963445,
    "max_drawdown": 0.06543142686162806,
-   "turnover": null
+   "turnover": 33.27486349971713
   },
   {
    "label": "H1 Variant C, net",
@@ -320,7 +330,7 @@
    "ann_vol": 0.05025165017905172,
    "sharpe": 0.42601479688771904,
    "max_drawdown": 0.05629191510426035,
-   "turnover": null
+   "turnover": 4.166615258751092
   },
   {
    "label": "H2 primary, net",
@@ -332,7 +342,7 @@
    "ann_vol": 0.06732570110284525,
    "sharpe": -0.15369679147334872,
    "max_drawdown": 0.07566456244156505,
-   "turnover": null
+   "turnover": 9.731788889151137
   },
   {
    "label": "H2 primary, gross",
@@ -344,7 +354,7 @@
    "ann_vol": 0.06740614617541245,
    "sharpe": -0.07566056349698952,
    "max_drawdown": 0.07176031808953498,
-   "turnover": null
+   "turnover": 9.731788889151137
   },
   {
    "label": "H2 primary, 2x costs",
@@ -356,7 +366,7 @@
    "ann_vol": 0.06727126258012497,
    "sharpe": -0.23183006956402027,
    "max_drawdown": 0.07961945533005421,
-   "turnover": null
+   "turnover": 9.731788889151137
   }
  ],
  "registered_decisions": {
@@ -453,16 +463,7 @@
   "distinct_h1_configurations": 24,
   "distinct_h2_configurations": 1
  },
- "missing_metrics": [
-  {
-   "metric": "holdout turnover (all rows)",
-   "file": "results/tables/oos_performance.csv",
-   "column": "turnover",
-   "rows": 21,
-   "value": null,
-   "status": "MISSING"
-  }
- ],
+ "missing_metrics": [],
  "claims": [
   {
    "id": "summary_dev_sharpes",
@@ -1377,21 +1378,6 @@
    "problems": []
   },
   {
-   "id": "holdout_A_drawdown_precision",
-   "category": "primary",
-   "evidence": "original_frozen",
-   "period": "holdout",
-   "sources": [
-    "results/tables/oos_performance.csv"
-   ],
-   "errata": [],
-   "displayed": [
-    "5.4467%"
-   ],
-   "status": "pass",
-   "problems": []
-  },
-  {
    "id": "conclusion_holdout_A",
    "category": "primary",
    "evidence": "original_frozen",
@@ -1403,6 +1389,66 @@
    "displayed": [
     "+0.63",
     "0.97"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "recovered_turnover_A",
+   "category": "primary",
+   "evidence": "post_evaluation",
+   "period": "holdout",
+   "sources": [
+    "review/reproduction/oos_performance_reproduced.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "6.3×"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "recovered_turnover_H2",
+   "category": "primary",
+   "evidence": "post_evaluation",
+   "period": "holdout",
+   "sources": [
+    "review/reproduction/oos_performance_reproduced.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "9.7×"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "recovered_turnover_B",
+   "category": "secondary",
+   "evidence": "post_evaluation",
+   "period": "holdout",
+   "sources": [
+    "review/reproduction/oos_performance_reproduced.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "33.3×"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "recovered_turnover_C",
+   "category": "secondary",
+   "evidence": "post_evaluation",
+   "period": "holdout",
+   "sources": [
+    "review/reproduction/oos_performance_reproduced.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "4.2×"
    ],
    "status": "pass",
    "problems": []

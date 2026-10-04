@@ -1,0 +1,148 @@
+Matplotlib is building the font cache; this may take a moment.
+
+[1] Data audit
+Data audit (in-sample, trading dates before 2024-10-01)
+
+== Contract size and tick vs config.yaml ==
+LE: 95 contracts; size [40000.0] LBS, tick $[0.00025] -> matches config (40000, $0.00025); defined with size 0: ['LEM2010']
+GF: 122 contracts; size [50000.0] LBS, tick $[0.00025] -> matches config (50000, $0.00025)
+ZC: 85 contracts; size [5000.0] BU, tick $[0.0025] -> matches config (5000, $0.0025)
+
+== Definition last trade date vs CME rules ==
+LE: 86 expired contracts checked, 0 differ
+GF: 114 expired contracts checked, 0 differ
+ZC: 72 expired contracts checked, 0 differ
+
+== Contracts with more than one published expiry or instrument_id ==
+  GFX2012: id 24087 expiry 2012-11-29 published 2011-11-02..2011-11-17 size 50000; id 24087 expiry 2012-11-15 published 2011-11-19..2012-11-15 size 50000
+  GFX2017: id 6402 expiry 2017-11-30 published 2016-11-02..2016-11-10 size 50000; id 6402 expiry 2017-11-16 published 2016-11-12..2017-11-16 size 50000
+  GFX2018: id 189 expiry 2018-11-29 published 2017-11-02..2017-11-02 size 50000; id 189 expiry 2018-11-15 published 2017-11-05..2018-11-15 size 50000
+  GFX2023: id 60 expiry 2023-11-30 published 2022-11-03..2022-11-03 size 50000; id 60 expiry 2023-11-16 published 2022-11-06..2023-11-16 size 50000
+  ZCN2014: id 214367 expiry 2014-07-14 published 2010-06-28..2010-07-01 size 0; id 640057 expiry 2014-07-14 published 2010-07-03..2014-07-17 size 5000
+
+== Last trading-day settlement vs definition last trade date (expired contracts) ==
+LE: 86 contracts, 1 differ (days) {'LEZ2014': -1}
+GF: 114 contracts, 1 differ (days) {'GFU2014': -3}; GF cash-final records dated the next business day: 90
+ZC: 72 contracts, 0 differ (days) {}
+
+== Dates a product is missing while another product settled ==
+LE: 8 dates ['2012-02-06', '2012-02-07', '2012-02-08', '2012-02-09', '2014-06-12', '2014-09-23', '2014-09-24', '2014-09-25']
+GF: 8 dates ['2012-02-06', '2012-02-07', '2012-02-08', '2012-02-09', '2014-06-12', '2014-09-23', '2014-09-24', '2014-09-25']
+ZC: 2 dates ['2020-02-27', '2020-06-30']
+
+== Settlement cleaning: what each rule removed or changed (outright futures) ==
+root                                               LE            GF        ZC
+settlement records                         149228.000  136847.00000  342582.0
+dropped: null trading date                   1073.000    1054.00000    1903.0
+dropped: price <= 0                           479.000     771.00000     412.0
+contract-days lost (only <=0 prints)          390.000     634.00000     356.0
+contract-days kept                          31957.000   29064.00000   53834.0
+days with disagreeing prints                   30.000      43.00000     148.0
+days where used price != first print           30.000      43.00000     146.0
+largest such correction ($/unit)                2.933       7.30475       1.0
+out-of-range prints                            17.000      18.00000       0.0
+out-of-range prints used                        0.000       0.00000       0.0
+post-2017-05-21 days without a final flag      71.000     121.00000      71.0
+LE prints above $3.0/lb: 16 on ['2015-11-02'], instrument_ids [731, 7780, 13621, 15172, 25444, 108928, 144592, 165581]
+
+== Day-over-day settlement moves above 10% within a contract ==
+LE: 0
+GF: 0
+ZC: 0
+
+
+[2] Feeding margin (primary spec)
+3606 daily and 172 month-end values, 2010-06 to 2024-09; B = 64.2857 bu; month-end M_t mean $-146, sd $67, range $-290 to $49 per head
+
+[3] Mechanism: P1 (primary + pre-declared diagnostics 1a, 2a), P3, leg decomposition
+P1 primary                                      z     beta +0.00197  NW t +0.42  n 133  -> FAIL
+P1 diag_1a_seasonally_adjusted                  z_sa  beta -0.00470  NW t -0.76  n 73
+P1 diag_2a_joint_z_and_z_le                     z     beta +0.00742  NW t +1.79  n 133
+P1 diag_2a_joint_z_and_z_le                     z_le  beta -0.01554  NW t -3.31  n 133
+P3 P3 (i) futures return                        z     beta -0.00867  NW t -0.65  n 127
+P3 P3 (ii) spot change                          z     beta +0.01984  NW t +1.10  n 127
+P3 P3 (i) futures change, $/lb (supplemental)   z     beta -0.00887  NW t -0.51  n 127
+P3 verdict: {'spot_predicted': False, 'futures_not_predicted': True, 'spot_predicted_futures_not': False, 'dropped_month_ends': ['2014-06-30', '2014-07-31', '2014-12-31']}
+                  mean_when_z_below_-1  n_when_z_below_-1  variance_share_all_t  n_all_t
+LE (sale value)                155.727                 15                 0.792      131
+GF (feeder cost)               -27.373                 15                 0.090      131
+ZC (corn cost)                  24.461                 15                 0.118      131
+dM (total)                     152.814                 15                 1.000      131
+
+[4] Variant A (primary), drawdown overlay, and diagnostics 1b / 2b
+                  run      start        end  ann_return  ann_vol  sharpe  max_drawdown  mean_monthly  nw_t_monthly  worst_month worst_month_label  avg_gross_leverage  turnover
+              primary 2013-07-01 2024-09-30     -0.0054   0.0642 -0.0841        0.2553       -0.0004       -0.3356      -0.0493           2020-03              0.4327    6.5128
+              overlay 2013-07-01 2024-09-30     -0.0092   0.0504 -0.1832        0.2065       -0.0008       -0.7610      -0.0381           2018-12              0.3311    4.9035
+      diag_2b_le_only 2013-07-01 2024-09-30     -0.0236   0.0867 -0.2728        0.4138       -0.0020       -0.8690      -0.0847           2014-06              0.5918    8.0814
+diag_1b_seasonal_only 2018-07-02 2024-09-30     -0.0076   0.0639 -0.1196        0.2569       -0.0006       -0.2810      -0.0473           2019-05              0.4461    6.6485
+returns  ann_return  sharpe  mean_monthly  nw_t_monthly
+    net     -0.0054 -0.0841       -0.0004       -0.3356
+  gross     -0.0039 -0.0609       -0.0003       -0.2441
+  net2x     -0.0069 -0.1072       -0.0006       -0.4264
+P2 in-sample (Variant A primary, net): mean monthly -0.0450%, NW t -0.34 -> FAIL (OOS Sharpe part pending run_oos.py)
+           diagnostic   n   alpha  alpha_t   beta  beta_t     r2   corr  position_corr  n_rebalances
+      diag_2b_le_only 135 -0.0002  -0.1286 0.1392  0.9881 0.0369 0.1920         0.3860           136
+diag_1b_seasonal_only  75  0.0004   0.3649 0.8876 12.2887 0.7398 0.8601         0.7366            76
+
+[5] Variants B and C (primary), drawdown overlay, and diagnostic 1b
+Variant B
+                  run      start        end  ann_return  ann_vol  sharpe  max_drawdown  mean_monthly  nw_t_monthly  worst_month worst_month_label  avg_gross_leverage  max_gross_leverage  turnover  deferred_trades  gf_cash_final_closes  gf_ltd_settlement_closes
+              primary 2013-07-01 2024-09-30     -0.0194   0.0702 -0.2763        0.3811       -0.0016       -1.3361      -0.0688           2019-11              1.5781              5.5059   23.4214                1                    11                         4
+              overlay 2013-07-01 2024-09-30     -0.0158   0.0472 -0.3340        0.2661       -0.0013       -1.6239      -0.0426           2015-12              1.0077              4.4112   14.7061                1                    11                         4
+diag_1b_seasonal_only 2018-07-02 2024-09-30     -0.0159   0.0706 -0.2253        0.2445       -0.0013       -0.6415      -0.0677           2019-11              1.6749              4.9833   25.0612                1                     6                         3
+returns  ann_return  sharpe  mean_monthly  nw_t_monthly
+    net     -0.0194 -0.2763       -0.0016       -1.3361
+  gross     -0.0137 -0.1946       -0.0011       -0.9505
+  net2x     -0.0251 -0.3580       -0.0021       -1.7135
+           diagnostic  n  alpha  alpha_t   beta  beta_t     r2   corr  position_corr  n_rebalances
+diag_1b_seasonal_only 75 0.0013   1.3237 0.8376 11.0555 0.7366 0.8582         0.7788            76
+Variant C
+                  run      start        end  ann_return  ann_vol  sharpe  max_drawdown  mean_monthly  nw_t_monthly  worst_month worst_month_label  avg_gross_leverage  max_gross_leverage  turnover  deferred_trades  gf_cash_final_closes  gf_ltd_settlement_closes
+              primary 2013-07-01 2024-09-30     -0.0018   0.0484 -0.0367        0.2029       -0.0001       -0.1447      -0.0407           2018-12              0.2586              1.9881    4.4499                0                     0                         0
+              overlay 2013-07-01 2024-09-30     -0.0058   0.0391 -0.1488        0.1825       -0.0005       -0.5904      -0.0407           2018-12              0.1978              1.9881    3.4611                0                     0                         0
+diag_1b_seasonal_only 2018-07-02 2024-09-30     -0.0036   0.0507 -0.0711        0.1753       -0.0003       -0.1573      -0.0473           2019-05              0.2351              1.6520    3.7930                0                     0                         0
+returns  ann_return  sharpe  mean_monthly  nw_t_monthly
+    net     -0.0018 -0.0367       -0.0001       -0.1447
+  gross     -0.0008 -0.0158       -0.0001       -0.0624
+  net2x     -0.0028 -0.0577       -0.0002       -0.2266
+           diagnostic  n  alpha  alpha_t   beta  beta_t     r2   corr  position_corr  n_rebalances
+diag_1b_seasonal_only 75 0.0002   0.2468 0.8460 12.3149 0.8063 0.8980         0.7481            76
+C: share of rebalances flat after the hedging-pressure filter: 41%
+
+[6] Robustness: 7 one-at-a-time specs x 3 variants, overlay alongside (logged)
+variant               A                            B                            C                      
+window           common  full seasonal_window common  full seasonal_window common  full seasonal_window
+spec                                                                                                   
+fcr_5.5           -0.05 -0.07             NaN  -0.25 -0.28             NaN  -0.11 -0.03             NaN
+fcr_6.5           -0.02 -0.10             NaN  -0.24 -0.27             NaN  -0.04 -0.03             NaN
+primary           -0.04 -0.08           -0.03  -0.24 -0.28            0.04  -0.07 -0.04           -0.02
+sale_horizon_120   0.22  0.09             NaN   0.06 -0.01             NaN   0.16  0.16             NaN
+sale_horizon_180  -0.07 -0.13             NaN  -0.36 -0.42             NaN  -0.05 -0.06             NaN
+seasonal_adjust     NaN  0.08            0.08    NaN  0.21            0.21    NaN  0.00            0.00
+z_lookback_24      0.06  0.03             NaN  -0.20 -0.26             NaN   0.00  0.06             NaN
+z_lookback_48     -0.02 -0.02             NaN  -0.26 -0.26             NaN  -0.04 -0.04             NaN
+
+[7] Deflated Sharpe Ratio
+                            strategy  sharpe_annual  n_cattle_project_trials  raw_logged_rows  sr0_annual    psr    dsr
+              H1 primary (Variant A)        -0.0841                       25              223      0.3142 0.3892 0.0912
+                          H2 primary        -0.2882                       25              223      0.3142 0.1668 0.0216
+Best of the 25 cattle-project trials         0.2148                       25              223      0.3142 0.7045 0.4017
+
+[8] Stress tests and liquidity/capital
+written: stress_episodes.csv, stress_limit_shock.csv, liquidity_by_leg.csv, capital.csv
+
+[9] H2 (HYPOTHESIS_H2.md): primary specification, development data only (logged)
+Q1: beta +0.00981  NW t +0.10  n 170  pass=False
+Q2: beta +0.00361  NW t +0.88  n 134  pass=False
+Q3_in_sample: beta -0.00153  NW t -1.08  n 134  pass=False
+
+[10] Development accounting checks and pre-declared additional checks (not trials)
+           term    coef    t_nw  annualized  n_months     r2 first_month last_month
+alpha (monthly) -0.0009 -0.6426     -0.0104       135 0.0764     2013-07    2024-09
+   long_only_LE -0.0664 -1.1637         NaN       135 0.0764     2013-07    2024-09
+   LE_TSMOM_12m  0.0885  1.8433         NaN       135 0.0764     2013-07    2024-09
+            SPY  0.0592  1.3961         NaN       135 0.0764     2013-07    2024-09
+written: h1_accounting.csv, factors.csv, by_year.csv, capacity_curve.csv, h2_stress_episodes.csv
+
+[11] In-sample guard
+all development outputs end before oos_start; no holdout data read

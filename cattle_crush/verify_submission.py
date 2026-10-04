@@ -21,6 +21,7 @@ import argparse
 import csv
 import hashlib
 import json
+import math
 import os
 import re
 import sys
@@ -109,6 +110,8 @@ def fmt_value(x, spec):
         s = str(x)
         return s[:spec['slice']] if 'slice' in spec else s
     d = Decimal(repr(float(x))) * Decimal(str(spec.get('scale', 1)))
+    if not d.is_finite():
+        raise ClaimError('non-finite numerical claim')
     if spec.get('round_to'):
         step = Decimal(str(spec['round_to']))
         d = (d / step).quantize(Decimal(1), ROUND_HALF_UP) * step
@@ -506,10 +509,38 @@ def check_missing(claims, store, rep):
     filled = [(r['hypothesis'], r['spec'], r['returns'], r[spec['column']]) for r in rows
               if r[spec['column']].strip() != '']
     zeros = [f for f in filled if re.fullmatch(r'[-+]?0*\.?0*', f[3])]
-    detail = (f'{spec["column"]} blank in all {len(rows)} holdout rows; reported as MISSING, never zero'
+    detail = (f'original {spec["column"]} blank in all {len(rows)} rows; preserved, never replaced with zero'
               if not filled else f'{len(filled)} rows carry a value the note says is missing'
               + (f'; {len(zeros)} are zero, a missing value reported as zero' if zeros else ''))
     rep.add('holdout.turnover_missing', not filled and norm(spec['paper_text']) in claims['_note_text'], detail)
+    recovered = claims.get('holdout_recovered')
+    if recovered:
+        rerun = store._load(recovered['file'])
+        report = store._load(recovered['report'])
+        keys = ('hypothesis', 'spec', 'returns')
+        original = {tuple(r[k] for k in keys): r for r in rows}
+        actual = {tuple(r[k] for k in keys): r for r in rerun}
+        valid = len(actual) == len(rerun) == len(rows) and actual.keys() == original.keys()
+        for key, row in actual.items():
+            value = float(row['turnover'])
+            valid = valid and math.isfinite(value) and value >= 0
+            baseline = original.get(key, {})
+            for col, old in baseline.items():
+                if col == 'turnover':
+                    continue
+                new = row.get(col, '')
+                try:
+                    equal = math.isclose(float(old), float(new), rel_tol=1e-9, abs_tol=1e-11)
+                except ValueError:
+                    equal = old == new
+                valid = valid and equal
+        rep.add('holdout.turnover_recovered', valid,
+                f'{len(rerun)} replay rows have finite turnover; original return metrics unchanged within tolerance')
+        source_ok = all((store.root / p).is_file() and sha256(store.root / p) == digest
+                        for p, digest in report['source_sha256'].items())
+        rep.add('reproduction.recorded_run', report['status'] == 'PASS' and source_ok,
+                'Saved isolated reproduction report passes and its source hashes match; this verifier does not rerun it')
+        return []
     return [{'metric': spec['label'], 'file': spec['file'], 'column': spec['column'], 'rows': len(rows),
              'value': None, 'status': 'MISSING' if not filled else 'PRESENT'}]
 
@@ -587,6 +618,11 @@ def headline(store, claims):
             for key in h['turnover_json'][1:]:
                 node = node[key]
             vals['turnover'] = float(node)
+        if h['period'] == 'holdout' and claims.get('holdout_recovered'):
+            recovered = store.rows(claims['holdout_recovered']['file'], h['where'])
+            if len(recovered) != 1:
+                raise ClaimError('recovered turnover must match exactly one holdout row')
+            vals['turnover'] = float(recovered[0]['turnover'])
         out.append({'label': h['label'], 'role': h['role'], 'period': h['period'], 'costs': h['costs'],
                     'source': h['file'], **vals})
     return out

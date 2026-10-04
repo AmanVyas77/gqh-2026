@@ -6,43 +6,42 @@
     [
       78.0,
       81.36718719999999,
-      533.9999761999994,
+      539.9999753,
       707.3149412
     ],
     [
       78.0,
       80.73583959999996,
-      532.7758588999995,
+      539.9999753,
       681.0149412000001
     ],
     [
       78.0,
       80.73583959999996,
-      533.9999794999993,
+      539.9999753,
       646.9149412
     ],
     [
       78.0,
       80.73583959999996,
-      533.9999817999994,
+      539.9999753,
       704.1149412
     ],
     [
       78.0,
       80.73583959999996,
-      533.9999793999995,
+      539.9999753,
       695.3149412
     ],
     [
       78.0,
       80.73583959999996,
-      532.2548581999995,
-      659.9149412
+      539.9999623,
+      672.6149412
     ]
   ],
-  "table_check": "Overlay development drawdown corrected to 20.6% from saved fraction; other numeric table cells unchanged.",
-  "visual_review": "All pages reviewed during integration; latest changed page 5 rendered and inspected with no clipping or overlap.",
-  "no_backtests_or_holdout_evaluation": true,
-  "revision": "4 October 2026: prospective risk governance, portable reference [14], overlay rounding correction; exploratory post-hoc A/B funding sensitivity; Section 5 conclusion now summarizes funding sensitivity",
-  "pdf_text_check": "Every display value in the claims verifier report independently found in rebuilt PDF text using pdfplumber; prospective governance passage also confirmed."
+  "revision": "4 October 2026: frozen-strategy reproduction and recovered holdout turnover; unchanged return metrics and decisions",
+  "no_strategy_tuning": true,
+  "holdout_reproduction": true,
+  "visual_review": "Updated pages 4 and 5 rendered and inspected: no clipping or overlap; six pages total, five main plus references."
 }

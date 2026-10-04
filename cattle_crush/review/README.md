@@ -3,8 +3,7 @@
 Everything in this directory was produced **after** the one-time holdout evaluation (lock: commit
 `58d6299`, 2026-10-04 04:45:01 UTC). It is post-evaluation evidence: audits, corrections, uncertainty
 intervals and funding/capacity supplements computed from existing development records. It is not
-preregistered confirmation, it does not replace either frozen primary, and no holdout evaluation was
-rerun to produce it. Both registered decisions (H1 and H2 rejected) are unchanged.
+preregistered confirmation, it does not replace either frozen primary, and the earlier audits did not replay the holdout. The later submission reproduction below replays the frozen holdout solely to check results and recover omitted turnover. Both registered decisions (H1 and H2 rejected) are unchanged.
 
 The original frozen artifacts are in `../results/` and are hash-checked by `../verify_submission.py`.
 
@@ -46,10 +45,15 @@ The original review material was copied unchanged. The prospective risk assessme
 
 ## Limitations that remain
 
-- **Holdout turnover is missing**: no holdout trade ledger was saved, and it is not inferred.
+- The original holdout table omitted turnover; a frozen-strategy replay now recovers it in
+  [`reproduction/`](reproduction/README.md), with the original artifacts preserved.
 - H2 volume-based capacity, factor attribution and its four registered alternative trials were not run;
   no five-trial H2-only DSR is claimed.
 - Funding uses current margin proxies, not historical margin calls; capacity figures are participation
   illustrations, not profitable capacity; fills are not verified.
 - The 2 October NASS probe returned post-cutoff rows in memory before the boundary was enforced (see the
   note, Section 4); absolute claims that no holdout data was accessed are unsupported.
+
+## Submission reproduction
+
+`reproduction/` records a later replay of the original development and holdout pipelines, with a reporting-only turnover repair. It is separate from the earlier corrected development audits above. See its README for comparisons, input hashes and limitations.
