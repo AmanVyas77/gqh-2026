@@ -1,0 +1,4 @@
+active_H1_signal_inputs,active_H1_inputs_without_price_by_cutoff,active_H1_inputs_revised_after_cutoff,root,selected_records,late_received_selected,no_record_by_cutoff,different_price_after_cutoff,cutoff
+136,0,0,LE,31957,16385,100,0,00:00 UTC after ts_ref date; not guaranteed historical execution availability
+136,0,0,GF,29064,14725,88,0,00:00 UTC after ts_ref date; not guaranteed historical execution availability
+136,0,0,ZC,53834,28038,140,0,00:00 UTC after ts_ref date; not guaranteed historical execution availability

@@ -9,7 +9,31 @@ development, H1 failed P1 (t = 0.42) and P2's in-sample condition (net Sharpe �
 Q2 and Q3 (t = 0.10, 0.88, −1.08). The two-year holdout (2024-10-01 to 2026-10-02) was **evaluated once on
 2026-10-04** (lock at commit `58d6299`): H1's primary earned a net Sharpe of **+0.63** (meeting P2's holdout
 condition; H1 remains rejected because P1 and P2's in-sample condition failed) and H2's primary earned
-**−0.15** (Q3 not met). Note: [`note/research_note.pdf`](note/research_note.pdf) (4 pages).
+**−0.15** (Q3 not met).
+
+**Current note:** [`paper/research_note_edited.pdf`](paper/research_note_edited.pdf) (five main pages plus
+references; editable source `paper/research_note_edited.html`). `note/research_note.pdf` is the
+superseded 4-page note from the freeze.
+
+## Verify the submission without market data (judges start here)
+
+```bash
+cd cattle_crush
+python verify_submission.py
+```
+
+Python 3.9+ standard library only: no install, no credentials, no network, no market data. It checks the
+hashes of the frozen specifications, saved results, trial log and holdout lock; checks that 55 numerical
+claims in the note (`submission/claims.json`: source file, row selector, column, units, rounding) match
+the saved rows and the editable note; recomputes the registered pass/fail conditions from saved tables
+and confirms both decisions remain **rejected**; reconciles the trial log; and reports holdout turnover as
+**missing**. It prints a report, writes `submission/verification_report.json`, and exits 1 on any missing
+or inconsistent required artifact. If PyMuPDF happens to be installed, it also checks the values in the
+PDF text and the minimum font size.
+
+**What it does not prove:** that the code regenerates these tables. That computational reproduction
+needs the licensed inputs below and the pinned environment; it was not performed by this command.
+Tests for the verifier: `python -m unittest discover -s tests -p "test_verify_submission.py"`.
 
 | File | Purpose |
 |---|---|
@@ -21,8 +45,12 @@ condition; H1 remains rejected because P1 and P2's in-sample condition failed) a
 | `data/audit.py` | Contract-definition and settlement audit |
 | `src/` | Contracts, margin, signals, backtest, costs, mechanism tests, reports, H2, trial log |
 | `run_all.py` | Reproduces every development number (no holdout access) |
-| `run_oos.py` | One-time holdout evaluation (not run) |
-| `results/` | Tables, figures and the append-only `trial_log.csv` |
+| `run_oos.py` | One-time holdout evaluation (run once on 2026-10-04; now reproduces it only while `config.yaml` matches the lock) |
+| `results/` | Original saved tables, figures, the append-only `trial_log.csv` and `oos_lock.json` |
+| `paper/` | Current note, editable HTML, renderer and recorded formatting QA |
+| `review/` | Post-evaluation audits, corrections and supplements (labelled as such; not preregistered evidence) |
+| `submission/` | Claims manifest, hash manifest and the latest verification report |
+| `verify_submission.py`, `tests/test_verify_submission.py` | Artifact-only verifier and its focused tests |
 
 ## Setup
 
@@ -103,7 +131,7 @@ the re-run completed. Outputs: `results/tables/oos_performance.csv`, `results/fi
 
 | Holdout, net of 1× costs | Ann. return | Sharpe | Max DD | Monthly mean (NW t) | Condition |
 |---|---:|---:|---:|---:|---|
-| **H1 primary (Variant A)** | +3.88% | **+0.63** | 5.5% | +0.31% (0.97) | P2 holdout: Sharpe > 0, met |
+| **H1 primary (Variant A)** | +3.88% | **+0.63** | 5.4% | +0.31% (0.97) | P2 holdout: Sharpe > 0, met |
 | **H2 primary** | −1.03% | **−0.15** | 7.6% | −0.08% (−0.27) | Q3 holdout: Sharpe > 0, not met |
 | H1 Variant B (secondary) | +8.03% | +0.86 | 6.5% | +0.64% (1.40) | reported, not substituted |
 | H1 Variant C (secondary) | +2.14% | +0.43 | 5.6% | +0.17% (0.80) | reported, not substituted |
@@ -113,3 +141,26 @@ remains rejected under the pre-registered decision table. A two-year Sharpe has 
 0.7, so +0.63 is not statistically distinguishable from zero.
 
 `python run_oos.py` now only reproduces this evaluation, and only while `config.yaml` matches the lock.
+It needs the holdout-window licensed data; it was not rerun for any later audit or supplement.
+
+Holdout max drawdown for H1 is the saved fraction 0.054466625142137515, shown as 5.4% at one decimal
+(earlier versions of this README showed 5.5%). **Holdout turnover is missing**: no holdout trade ledger
+was saved, the `turnover` column of `results/tables/oos_performance.csv` is blank, and it is not inferred.
+
+## Original results, post-evaluation material and errata
+
+- `results/` holds the original frozen outputs: development tables from `run_all.py` and the single
+  holdout evaluation from `run_oos.py`. Their hashes are checked by `verify_submission.py`.
+- `review/` holds post-evaluation audits, corrections and supplements (uncertainty intervals, execution
+  session checks, funding and order-capacity diagnostics). They were made after the holdout evaluation,
+  are labelled as post-evaluation in the note and in `submission/claims.json`, and change no registered
+  decision. See [`review/README.md`](review/README.md).
+- Trial accounting: `results/trial_log.csv` has 171 rows (76 trial, 73 overlay, 15 diagnostic, 7 oos);
+  164 are development rows, as recorded in `SUBMISSION_FREEZE.md`. The 76 trial rows contain 25 distinct
+  configurations (24 H1, 1 H2); repeats from reproduction runs are not new trials.
+  `results/tables/trials.csv` was written from an earlier 162-row / 75-trial-row snapshot of the log and
+  uses the same 25 configurations. Post-evaluation reproduction rows were kept in a separate review log
+  that is not part of this repository.
+- **Erratum:** the note shows 20.7% maximum drawdown for the supplemental development row "A + overlay,
+  net"; the saved fraction 0.2064627979599919 rounds to 20.6%. No decision or headline uses it. Details in
+  [`paper/README.md`](paper/README.md).

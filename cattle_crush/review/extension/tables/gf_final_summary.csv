@@ -1,0 +1,2 @@
+observed_pairs,pairs_last_mark_on_actual_ltd,median_abs_relative_gap,max_abs_relative_gap,missing_final_closes,sum_abs_envelope_pct_initial,interpretation
+90,89,0.0014941231660118293,0.008417797629273416,4,1.4008191681675526,"Empirical maximum from other contracts, not a bound on missing finals or an imputed P&L."

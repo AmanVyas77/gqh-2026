@@ -1,0 +1,2 @@
+contrast,n,reference_prior_year_three_month_placements,estimated_pct_change,ci95_pct_low,ci95_pct_high,estimated_heads_change,ci95_heads_low,ci95_heads_high,mde80_log_slope,mde80_pct_reduction,distressed_monthends_z_below_minus1
+one unit decrease in margin z,133,5616511.278195488,-0.19680241744636123,-1.1172212311315324,0.7321838212559184,-11053.429971636244,-62748.85644889699,41123.18689796136,0.01343289045419294,1.334307180569816,15

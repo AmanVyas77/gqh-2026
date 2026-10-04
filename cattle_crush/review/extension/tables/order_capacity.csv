@@ -1,0 +1,10 @@
+variant,participation_fraction,illustrative_aum_ceiling,binding_contract,binding_execution_date,binding_root,peak_participation_at_1m,interpretation
+A,0.01,1276768.156498593,LEG2014,2013-09-03,LE,0.007832275538124309,Linear scaling; historical peak order / prior ADV. Not a profitable capacity estimate.
+A,0.05,6383840.782492965,LEG2014,2013-09-03,LE,0.007832275538124309,Linear scaling; historical peak order / prior ADV. Not a profitable capacity estimate.
+A,0.1,12767681.56498593,LEG2014,2013-09-03,LE,0.007832275538124309,Linear scaling; historical peak order / prior ADV. Not a profitable capacity estimate.
+B,0.01,763587.7106422774,GFU2013,2013-08-01,GF,0.013096072475536161,Linear scaling; historical peak order / prior ADV. Not a profitable capacity estimate.
+B,0.05,3817938.5532113872,GFU2013,2013-08-01,GF,0.013096072475536161,Linear scaling; historical peak order / prior ADV. Not a profitable capacity estimate.
+B,0.1,7635877.1064227745,GFU2013,2013-08-01,GF,0.013096072475536161,Linear scaling; historical peak order / prior ADV. Not a profitable capacity estimate.
+C,0.01,1524082.850605225,LEJ2014,2013-11-01,LE,0.0065613230908207676,Linear scaling; historical peak order / prior ADV. Not a profitable capacity estimate.
+C,0.05,7620414.253026124,LEJ2014,2013-11-01,LE,0.0065613230908207676,Linear scaling; historical peak order / prior ADV. Not a profitable capacity estimate.
+C,0.1,15240828.506052248,LEJ2014,2013-11-01,LE,0.0065613230908207676,Linear scaling; historical peak order / prior ADV. Not a profitable capacity estimate.

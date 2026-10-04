@@ -1,0 +1,49 @@
+{
+  "pages": 6,
+  "main_pages": 5,
+  "minimum_font_pt": 11.0,
+  "body_bounds": [
+    [
+      78.0,
+      81.58792877197266,
+      533.9765014648438,
+      570.4666748046875
+    ],
+    [
+      78.0,
+      80.91519165039062,
+      532.7510375976562,
+      681.1666870117188
+    ],
+    [
+      78.0,
+      80.91519165039062,
+      533.96923828125,
+      647.066650390625
+    ],
+    [
+      78.0,
+      80.91519165039062,
+      533.9912109375,
+      678.8666381835938
+    ],
+    [
+      78.0,
+      80.91519165039062,
+      533.9588012695312,
+      657.3666381835938
+    ],
+    [
+      78.0,
+      80.91519165039062,
+      532.2559814453125,
+      647.3666381835938
+    ]
+  ],
+  "main_words_including_table_text_before": 1999,
+  "main_words_including_table_text_after": 1941,
+  "protected_files_unchanged": 56,
+  "table_check": "All retained cells identical except approved H1 net holdout drawdown rounding; H2 loss-below-initial-NAV column moved to editorial notes",
+  "visual_review": "All six pages inspected; final page-3 heading checked separately",
+  "no_backtests_or_holdout_evaluation": true
+}

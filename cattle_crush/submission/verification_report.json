@@ -1,0 +1,1445 @@
+{
+ "tool": "verify_submission.py",
+ "scope": "artifact-only: checks saved tables, the holdout lock, the note and manifests for consistency; no data download, backtest, holdout evaluation or computational reproduction",
+ "status": "PASS",
+ "checks": [
+  {
+   "id": "required_files",
+   "status": "pass",
+   "detail": "104/104 present"
+  },
+  {
+   "id": "hashes.protected",
+   "status": "pass",
+   "detail": "42/42 match (frozen hypotheses, config, freeze record, original saved results, trial log and holdout lock as committed at 240c27c)"
+  },
+  {
+   "id": "hashes.code",
+   "status": "pass",
+   "detail": "30/30 match (signal/backtest/analysis code, data scripts, dependency pins and original tests as committed at 240c27c (unchanged since holdout-lock commit 58d6299))"
+  },
+  {
+   "id": "hashes.paper",
+   "status": "pass",
+   "detail": "6/6 match (current note, editable source, renderer and chart copied unchanged from output/pdf on 2026-10-04)"
+  },
+  {
+   "id": "hashes.post_evaluation",
+   "status": "pass",
+   "detail": "18/18 match (post-evaluation review tables and reports copied unchanged from the review checkout on 2026-10-04)"
+  },
+  {
+   "id": "paper.not_superseded",
+   "status": "pass",
+   "detail": "current note is not a superseded version"
+  },
+  {
+   "id": "paper.page_count",
+   "status": "pass",
+   "detail": "6 PDF pages counted; expected 6 (5 main + references, which the track rules exclude)"
+  },
+  {
+   "id": "paper.recorded_format_qa",
+   "status": "pass",
+   "detail": "recorded editorial QA: 5 main pages, minimum font 11.0 pt (recorded at build time, not re-measured here)"
+  },
+  {
+   "id": "paper.authors",
+   "status": "pass",
+   "detail": "authors in order: Aman Vyas, Zhicheng Li, Nicolas Slenko"
+  },
+  {
+   "id": "paper.required_statements",
+   "status": "pass",
+   "detail": "12/12 decision/labelling statements present"
+  },
+  {
+   "id": "paper.cited_files",
+   "status": "pass",
+   "detail": "8 repository paths cited by the note; all present or explicitly excluded"
+  },
+  {
+   "id": "paper.excluded_reference.review/offline.py",
+   "status": "warn",
+   "detail": "note cites review/offline.py, not shipped: post-evaluation review entry point; it pins the review checkout's patched sources and licensed local inputs, so it is not shipped. Use verify_submission.py for artifact checks; see review/README.md."
+  },
+  {
+   "id": "claims.evidence_labels",
+   "status": "pass",
+   "detail": "original vs post-evaluation labels follow source locations; holdout/development sources separated"
+  },
+  {
+   "id": "claims.values_and_note",
+   "status": "pass",
+   "detail": "55/55 claims match saved rows and the editable note"
+  },
+  {
+   "id": "claims.erratum",
+   "status": "warn",
+   "detail": "registered erratum, disclosed in README: h1_dev_A_overlay.max_drawdown: note shows 20.7%, saved value displays 20.6% (double rounding (20.646% -> 20.65 -> 20.7); the saved fraction rounds to 20.6% at one decimal)"
+  },
+  {
+   "id": "roles.holdout_lock",
+   "status": "pass",
+   "detail": "lock frozen_primaries={'H1': 'Variant A, primary spec', 'H2': 'primary specification'}, oos_start=2024-10-01, commit=58d6299"
+  },
+  {
+   "id": "roles.holdout_table",
+   "status": "pass",
+   "detail": "primary rows: ['H1:Variant A', 'H2:primary']; secondary: ['H1:Variant B', 'H1:Variant C']"
+  },
+  {
+   "id": "decisions.H1",
+   "status": "pass",
+   "detail": "Variant A: registered REJECTED, saved tables give REJECTED"
+  },
+  {
+   "id": "decisions.H2",
+   "status": "pass",
+   "detail": "two-stock sector-hedged basket: registered REJECTED, saved tables give REJECTED"
+  },
+  {
+   "id": "trials.log_counts",
+   "status": "pass",
+   "detail": "171 rows = 15 diagnostic + 7 oos + 73 overlay + 76 trial; 164 development; 25 distinct trial configurations (76 trial rows incl. repeats)"
+  },
+  {
+   "id": "trials.dsr_snapshot",
+   "status": "pass",
+   "detail": "results/tables/trials.csv: 162-row / 75-trial-row earlier snapshot; DSR trial count 25 equals distinct configurations in the log"
+  },
+  {
+   "id": "trials.freeze_record",
+   "status": "pass",
+   "detail": "SUBMISSION_FREEZE.md records (164, 76, 73, 15) (rows, trial, overlay, diagnostic) at freeze; development rows of the log give (164, 76, 73, 15)"
+  },
+  {
+   "id": "trials.note_statement",
+   "status": "pass",
+   "detail": "note states: \"There are 25 recorded distinct cattle-project trials: 24 H1 configurations and one H2 primary.\""
+  },
+  {
+   "id": "holdout.turnover_missing",
+   "status": "pass",
+   "detail": "turnover blank in all 21 holdout rows; reported as MISSING, never zero"
+  },
+  {
+   "id": "h2.pair_attribution",
+   "status": "pass",
+   "detail": "TXRH/XLY and TSN/XLP figures equal stock-plus-hedge pair P&L, labelled as pairs, not standalone stocks"
+  },
+  {
+   "id": "portability.absolute_paths",
+   "status": "pass",
+   "detail": "12 workflow files free of machine-specific absolute paths"
+  },
+  {
+   "id": "paper.pdf_text",
+   "status": "pass",
+   "detail": "PyMuPDF: 6 pages, minimum text size 11.0 pt; every claimed display value found in PDF text"
+  }
+ ],
+ "headline": [
+  {
+   "label": "H1 Variant A, net",
+   "role": "primary",
+   "period": "development",
+   "costs": "1x",
+   "source": "results/tables/variant_a.csv",
+   "ann_return": -0.005398862412184882,
+   "ann_vol": 0.06422749476877435,
+   "sharpe": -0.08405843060859447,
+   "max_drawdown": 0.25532668878985476,
+   "turnover": 6.512769185725983
+  },
+  {
+   "label": "H1 Variant A, gross",
+   "role": "primary",
+   "period": "development",
+   "costs": "0x",
+   "source": "results/tables/variant_a.csv",
+   "ann_return": -0.003913384690446893,
+   "ann_vol": 0.06425529378776322,
+   "sharpe": -0.06090369306181833,
+   "max_drawdown": 0.24358623992460104,
+   "turnover": 6.512769185725983
+  },
+  {
+   "label": "H1 Variant A, 2x costs",
+   "role": "primary",
+   "period": "development",
+   "costs": "2x",
+   "source": "results/tables/variant_a.csv",
+   "ann_return": -0.0068843401339228625,
+   "ann_vol": 0.06420601243299558,
+   "sharpe": -0.1072226707912636,
+   "max_drawdown": 0.2677410753555508,
+   "turnover": 6.512769185725983
+  },
+  {
+   "label": "H1 Variant A + overlay, net",
+   "role": "overlay (supplemental)",
+   "period": "development",
+   "costs": "1x",
+   "source": "results/tables/variant_a.csv",
+   "ann_return": -0.00922733325541353,
+   "ann_vol": 0.05035447791997751,
+   "sharpe": -0.18324752110581813,
+   "max_drawdown": 0.2064627979599919,
+   "turnover": 4.903521302115947
+  },
+  {
+   "label": "H1 Variant B, net",
+   "role": "secondary",
+   "period": "development",
+   "costs": "1x",
+   "source": "results/tables/variant_b.csv",
+   "ann_return": -0.01940445355107131,
+   "ann_vol": 0.0702199860709794,
+   "sharpe": -0.2763380432952095,
+   "max_drawdown": 0.38113623550008746,
+   "turnover": 23.42138068912601
+  },
+  {
+   "label": "H1 Variant C, net",
+   "role": "secondary",
+   "period": "development",
+   "costs": "1x",
+   "source": "results/tables/variant_c.csv",
+   "ann_return": -0.0017803575416769283,
+   "ann_vol": 0.04844908892152232,
+   "sharpe": -0.036746976698792955,
+   "max_drawdown": 0.2029217836596967,
+   "turnover": 4.449863292846995
+  },
+  {
+   "label": "H1 A seasonal-only, net",
+   "role": "diagnostic",
+   "period": "development",
+   "costs": "1x",
+   "source": "results/tables/variant_a.csv",
+   "ann_return": -0.007647147419293803,
+   "ann_vol": 0.06394362340782911,
+   "sharpe": -0.11959202515817245,
+   "max_drawdown": 0.25688733982106693,
+   "turnover": 6.648485804590103
+  },
+  {
+   "label": "H2 primary, net",
+   "role": "primary",
+   "period": "development",
+   "costs": "1x",
+   "source": "results/tables/h2_performance.csv",
+   "ann_return": -0.018442930295838652,
+   "ann_vol": 0.06399673761217287,
+   "sharpe": -0.28818547607230854,
+   "max_drawdown": 0.3082950292848349,
+   "turnover": 6.9071933847791485
+  },
+  {
+   "label": "H2 primary, gross",
+   "role": "primary",
+   "period": "development",
+   "costs": "0x",
+   "source": "results/tables/h2_performance.csv",
+   "ann_return": -0.014867451912643983,
+   "ann_vol": 0.06400563338245523,
+   "sharpe": -0.23228349017040345,
+   "max_drawdown": 0.28719349295088004,
+   "turnover": 6.9071933847791485
+  },
+  {
+   "label": "H2 primary, 2x costs",
+   "role": "primary",
+   "period": "development",
+   "costs": "2x",
+   "source": "results/tables/h2_performance.csv",
+   "ann_return": -0.022018408679033312,
+   "ann_vol": 0.0640033110543336,
+   "sharpe": -0.34401983766654637,
+   "max_drawdown": 0.33197587440583853,
+   "turnover": 6.9071933847791485
+  },
+  {
+   "label": "H1 Variant A, net",
+   "role": "primary",
+   "period": "holdout",
+   "costs": "1x",
+   "source": "results/tables/oos_performance.csv",
+   "ann_return": 0.03879993246967019,
+   "ann_vol": 0.0612840999298093,
+   "sharpe": 0.6331158084088536,
+   "max_drawdown": 0.054466625142137515,
+   "turnover": null
+  },
+  {
+   "label": "H1 Variant A, gross",
+   "role": "primary",
+   "period": "holdout",
+   "costs": "0x",
+   "source": "results/tables/oos_performance.csv",
+   "ann_return": 0.039716297254130215,
+   "ann_vol": 0.06128991788627176,
+   "sharpe": 0.6480070234035379,
+   "max_drawdown": 0.05414593247790711,
+   "turnover": null
+  },
+  {
+   "label": "H1 Variant A, 2x costs",
+   "role": "primary",
+   "period": "holdout",
+   "costs": "2x",
+   "source": "results/tables/oos_performance.csv",
+   "ann_return": 0.037883567685210146,
+   "ann_vol": 0.0612800404261666,
+   "sharpe": 0.6182040256787078,
+   "max_drawdown": 0.05478811511121506,
+   "turnover": null
+  },
+  {
+   "label": "H1 Variant A + overlay, net",
+   "role": "overlay (supplemental)",
+   "period": "holdout",
+   "costs": "1x",
+   "source": "results/tables/oos_performance.csv",
+   "ann_return": 0.013184761155141812,
+   "ann_vol": 0.04168571741380532,
+   "sharpe": 0.3162896544219084,
+   "max_drawdown": 0.05706618861974744,
+   "turnover": null
+  },
+  {
+   "label": "H1 Variant B, net",
+   "role": "secondary",
+   "period": "holdout",
+   "costs": "1x",
+   "source": "results/tables/oos_performance.csv",
+   "ann_return": 0.08032918732095437,
+   "ann_vol": 0.09307702090756964,
+   "sharpe": 0.8630399483963445,
+   "max_drawdown": 0.06543142686162806,
+   "turnover": null
+  },
+  {
+   "label": "H1 Variant C, net",
+   "role": "secondary",
+   "period": "holdout",
+   "costs": "1x",
+   "source": "results/tables/oos_performance.csv",
+   "ann_return": 0.021407946544301427,
+   "ann_vol": 0.05025165017905172,
+   "sharpe": 0.42601479688771904,
+   "max_drawdown": 0.05629191510426035,
+   "turnover": null
+  },
+  {
+   "label": "H2 primary, net",
+   "role": "primary",
+   "period": "holdout",
+   "costs": "1x",
+   "source": "results/tables/oos_performance.csv",
+   "ann_return": -0.010347744243201007,
+   "ann_vol": 0.06732570110284525,
+   "sharpe": -0.15369679147334872,
+   "max_drawdown": 0.07566456244156505,
+   "turnover": null
+  },
+  {
+   "label": "H2 primary, gross",
+   "role": "primary",
+   "period": "holdout",
+   "costs": "0x",
+   "source": "results/tables/oos_performance.csv",
+   "ann_return": -0.00509998700279215,
+   "ann_vol": 0.06740614617541245,
+   "sharpe": -0.07566056349698952,
+   "max_drawdown": 0.07176031808953498,
+   "turnover": null
+  },
+  {
+   "label": "H2 primary, 2x costs",
+   "role": "primary",
+   "period": "holdout",
+   "costs": "2x",
+   "source": "results/tables/oos_performance.csv",
+   "ann_return": -0.015595501483609846,
+   "ann_vol": 0.06727126258012497,
+   "sharpe": -0.23183006956402027,
+   "max_drawdown": 0.07961945533005421,
+   "turnover": null
+  }
+ ],
+ "registered_decisions": {
+  "H1": {
+   "primary": "Variant A",
+   "registered_decision": "REJECTED",
+   "derived_from_saved_tables": "REJECTED",
+   "conditions": [
+    {
+     "id": "P1",
+     "rule": "beta > 0 and Newey-West t > 2",
+     "estimate": 0.0019699632785928913,
+     "t": 0.41673007763277525,
+     "passed": false,
+     "saved_pass": "False",
+     "saved_agrees": true
+    },
+    {
+     "id": "P2_development",
+     "rule": "development mean monthly net > 0 and Newey-West t > 2",
+     "estimate": -0.000449746504295472,
+     "t": -0.3356245520846015,
+     "passed": false,
+     "saved_pass": null,
+     "saved_agrees": true
+    },
+    {
+     "id": "P2_holdout",
+     "rule": "holdout net Sharpe > 0",
+     "estimate": 0.6331158084088536,
+     "t": null,
+     "passed": true,
+     "saved_pass": null,
+     "saved_agrees": true
+    }
+   ]
+  },
+  "H2": {
+   "primary": "two-stock sector-hedged basket",
+   "registered_decision": "REJECTED",
+   "derived_from_saved_tables": "REJECTED",
+   "conditions": [
+    {
+     "id": "Q1",
+     "rule": "beta < 0 and Newey-West t < -2",
+     "estimate": 0.009809023233229679,
+     "t": 0.10437960744214311,
+     "passed": false,
+     "saved_pass": "False",
+     "saved_agrees": true
+    },
+    {
+     "id": "Q2",
+     "rule": "beta < 0 and Newey-West t < -2",
+     "estimate": 0.0036102104363988285,
+     "t": 0.8751676640110467,
+     "passed": false,
+     "saved_pass": "False",
+     "saved_agrees": true
+    },
+    {
+     "id": "Q3_development",
+     "rule": "development mean monthly net > 0 and Newey-West t > 2",
+     "estimate": -0.001534726194364682,
+     "t": -1.0819626665119046,
+     "passed": false,
+     "saved_pass": "False",
+     "saved_agrees": true
+    },
+    {
+     "id": "Q3_holdout",
+     "rule": "holdout net Sharpe > 0",
+     "estimate": -0.15369679147334872,
+     "t": null,
+     "passed": false,
+     "saved_pass": null,
+     "saved_agrees": true
+    }
+   ]
+  }
+ },
+ "trial_accounting": {
+  "total_rows": 171,
+  "kinds": {
+   "trial": 76,
+   "overlay": 73,
+   "diagnostic": 15,
+   "oos": 7
+  },
+  "development_rows": 164,
+  "holdout_rows": 7,
+  "trial_rows_including_repeats": 76,
+  "distinct_trial_configurations": 25,
+  "distinct_h1_configurations": 24,
+  "distinct_h2_configurations": 1
+ },
+ "missing_metrics": [
+  {
+   "metric": "holdout turnover (all rows)",
+   "file": "results/tables/oos_performance.csv",
+   "column": "turnover",
+   "rows": 21,
+   "value": null,
+   "status": "MISSING"
+  }
+ ],
+ "claims": [
+  {
+   "id": "summary_dev_sharpes",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/h2_performance.csv",
+    "results/tables/variant_a.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-0.08",
+    "-0.29"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "summary_holdout_sharpes",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "holdout",
+   "sources": [
+    "results/tables/oos_performance.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "+0.63",
+    "-0.15"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h1_test_P1",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/mechanism.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "+0.0020",
+    "0.42",
+    "133"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h1_test_P2",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/variant_a.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-0.045%",
+    "-0.34",
+    "135"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h1_test_P3_futures",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/mechanism.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-0.0087",
+    "-0.65",
+    "127"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h1_test_P3_spot",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/mechanism.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "+$0.020",
+    "1.10",
+    "127"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "p1_interpretation_intervals",
+   "category": "primary",
+   "evidence": "post_evaluation",
+   "period": "development",
+   "sources": [
+    "review/extension/tables/placements_interpretation.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "0.20%",
+    "-1.12%",
+    "+0.73%",
+    "11,000",
+    "-63,000",
+    "+41,000"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h1_dev_A_net",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/variant_a.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-0.54%",
+    "6.4%",
+    "-0.08",
+    "25.5%",
+    "6.5×"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h1_dev_A_gross",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/variant_a.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-0.39%",
+    "6.4%",
+    "-0.06",
+    "24.4%",
+    "6.5×"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h1_dev_A_2x",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/variant_a.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-0.69%",
+    "6.4%",
+    "-0.11",
+    "26.8%",
+    "6.5×"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h1_dev_A_overlay",
+   "category": "overlay",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/variant_a.csv"
+   ],
+   "errata": [
+    {
+     "column": "max_drawdown",
+     "note_shows": "20.7%",
+     "saved_displays": "20.6%"
+    }
+   ],
+   "displayed": [
+    "-0.92%",
+    "5.0%",
+    "-0.18",
+    "20.6%",
+    "4.9×"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h1_dev_B_net",
+   "category": "secondary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/variant_b.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-1.94%",
+    "7.0%",
+    "-0.28",
+    "38.1%",
+    "23.4×"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h1_dev_C_net",
+   "category": "secondary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/variant_c.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-0.18%",
+    "4.8%",
+    "-0.04",
+    "20.3%",
+    "4.4×"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h1_dev_days",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/variant_a.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "2,834"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "p2_hac_interval",
+   "category": "primary",
+   "evidence": "post_evaluation",
+   "period": "development",
+   "sources": [
+    "review/extension/tables/uncertainty.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-0.3076%",
+    "+0.2177%"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "distressed_months",
+   "category": "diagnostic",
+   "evidence": "post_evaluation",
+   "period": "development",
+   "sources": [
+    "review/extension/tables/placements_interpretation.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "15"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h2_test_Q1",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/h2_tests.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "+0.0098",
+    "0.10",
+    "170"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h2_test_Q2",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/h2_tests.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "+0.0036",
+    "0.88",
+    "134"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h2_test_Q3",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/h2_tests.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-0.15%",
+    "-1.08",
+    "134"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h2_dev_days",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/h2_dsr.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "2,810"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h2_dev_gross",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/h2_performance.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-1.49%",
+    "6.4%",
+    "-0.23",
+    "28.7%"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h2_dev_net",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/h2_performance.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-1.84%",
+    "6.4%",
+    "-0.29",
+    "30.8%"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h2_dev_2x",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/h2_performance.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-2.20%",
+    "6.4%",
+    "-0.34",
+    "33.2%"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h2_costs_exposure",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/h2_exposure_concentration.json"
+   ],
+   "errata": [],
+   "displayed": [
+    "6.9×",
+    "0.25%",
+    "0.11%",
+    "0.42×",
+    "10"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "q3_hac_interval",
+   "category": "primary",
+   "evidence": "post_evaluation",
+   "period": "development",
+   "sources": [
+    "review/extension/tables/uncertainty.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-0.4315%",
+    "+0.1245%"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "h2_pair_attribution",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/h2_exposure_concentration.json"
+   ],
+   "errata": [],
+   "displayed": [
+    "-12.1%",
+    "-4.5%",
+    "-16.6%"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "a_seasonal_diagnostic",
+   "category": "diagnostic",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/variant_a_diagnostics.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "0.86",
+    "75",
+    "0.74"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "p1_joint_diagnostic",
+   "category": "diagnostic",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/mechanism.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "1.79"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "trial_sharpe_range",
+   "category": "trial_accounting",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/robustness.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-0.42",
+    "+0.21",
+    "0.86"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "corrected_window_comparisons",
+   "category": "trial_accounting",
+   "evidence": "post_evaluation",
+   "period": "development",
+   "sources": [
+    "review/corrected/tables/robustness.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "0.20",
+    "0.23",
+    "0.90"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "dsr_A",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/trials.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-0.08",
+    "0.39",
+    "0.09"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "dsr_H2",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/trials.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-0.29",
+    "0.17",
+    "0.02"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "dsr_best_trial",
+   "category": "trial_accounting",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/trials.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "+0.21",
+    "0.70",
+    "0.40"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "dsr_null_max",
+   "category": "trial_accounting",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/trials.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "0.31"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "a_factor_alpha",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/factors.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-1.0%",
+    "-0.64",
+    "0.08"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "stress_episodes",
+   "category": "risk_capacity",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/h2_stress_episodes.csv",
+    "results/tables/stress_episodes.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "5.5%",
+    "1.4%",
+    "9.9%"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "limit_shock",
+   "category": "risk_capacity",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/stress_limit_shock.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "8.50",
+    "12.75",
+    "22.9%"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "capacity_1pct_adv",
+   "category": "risk_capacity",
+   "evidence": "original_frozen",
+   "period": "development",
+   "sources": [
+    "results/tables/capital.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "$1.28M",
+    "$0.76M",
+    "$1.52M"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "gross_over_current_nav",
+   "category": "risk_capacity",
+   "evidence": "post_evaluation",
+   "period": "development",
+   "sources": [
+    "review/corrected/tables/risk_current_nav.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "2.18×",
+    "7.49×",
+    "2.07×"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "b_margin_funding",
+   "category": "risk_capacity",
+   "evidence": "post_evaluation",
+   "period": "development",
+   "sources": [
+    "review/corrected/tables/risk_current_nav.csv",
+    "review/extension/tables/funding_envelopes.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "41.6%",
+    "$339k"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "unknown_sessions",
+   "category": "risk_capacity",
+   "evidence": "post_evaluation",
+   "period": "development",
+   "sources": [
+    "review/corrected/tables/order_participation_summary.csv",
+    "review/extension/tables/execution_session_summary.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "8",
+    "202"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "execution_correction_sharpes",
+   "category": "diagnostic",
+   "evidence": "post_evaluation",
+   "period": "development",
+   "sources": [
+    "review/corrected/tables/post_evaluation_execution.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-0.081",
+    "-0.260",
+    "-0.032"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "receipt_audit_inputs",
+   "category": "diagnostic",
+   "evidence": "post_evaluation",
+   "period": "development",
+   "sources": [
+    "review/extension/tables/settlement_receipt_summary.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "136"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "holdout_lock_commit",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "holdout",
+   "sources": [
+    "results/oos_lock.json"
+   ],
+   "errata": [],
+   "displayed": [
+    "58d6299"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "holdout_days",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "holdout",
+   "sources": [
+    "results/tables/oos_performance.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "504",
+    "503"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "holdout_H1A_net",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "holdout",
+   "sources": [
+    "results/tables/oos_performance.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "+3.88%",
+    "6.1%",
+    "+0.63",
+    "5.4%"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "holdout_H1A_gross_2x",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "holdout",
+   "sources": [
+    "results/tables/oos_performance.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "+3.97% / +3.79%",
+    "6.1%",
+    "+0.65 / +0.62",
+    "5.4% / 5.5%"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "holdout_H2_net",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "holdout",
+   "sources": [
+    "results/tables/oos_performance.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-1.03%",
+    "6.7%",
+    "-0.15",
+    "7.6%"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "holdout_H2_gross_2x",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "holdout",
+   "sources": [
+    "results/tables/oos_performance.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "-0.51% / -1.56%",
+    "6.7%",
+    "-0.08 / -0.23",
+    "7.2% / 8.0%"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "holdout_B_net",
+   "category": "secondary",
+   "evidence": "original_frozen",
+   "period": "holdout",
+   "sources": [
+    "results/tables/oos_performance.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "+8.03%",
+    "9.3%",
+    "+0.86",
+    "6.5%"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "holdout_C_net",
+   "category": "secondary",
+   "evidence": "original_frozen",
+   "period": "holdout",
+   "sources": [
+    "results/tables/oos_performance.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "+2.14%",
+    "5.0%",
+    "+0.43",
+    "5.6%"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "holdout_monthly_primaries",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "holdout",
+   "sources": [
+    "results/tables/oos_performance.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "+0.31%",
+    "0.97",
+    "-0.08%",
+    "-0.27"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "holdout_monthly_secondaries",
+   "category": "secondary",
+   "evidence": "original_frozen",
+   "period": "holdout",
+   "sources": [
+    "results/tables/oos_performance.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "+0.64%",
+    "1.40",
+    "+0.17%",
+    "0.80"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "holdout_A_drawdown_precision",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "holdout",
+   "sources": [
+    "results/tables/oos_performance.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "5.4467%"
+   ],
+   "status": "pass",
+   "problems": []
+  },
+  {
+   "id": "conclusion_holdout_A",
+   "category": "primary",
+   "evidence": "original_frozen",
+   "period": "holdout",
+   "sources": [
+    "results/tables/oos_performance.csv"
+   ],
+   "errata": [],
+   "displayed": [
+    "+0.63",
+    "0.97"
+   ],
+   "status": "pass",
+   "problems": []
+  }
+ ],
+ "not_machine_checked": [
+  "+$153/head five-month margin recovery for the 15 distressed month-ends (source table not mapped).",
+  "Sector-hedged basket held long: +0.52%/month (t = 1.57) (source table not mapped).",
+  "Approximate holdout Sharpe standard error 0.7 (analytic approximation, not a saved value).",
+  "Rule and cost parameters (margin formula, contract-selection days, sizing, costs); these come from HYPOTHESIS.md/HYPOTHESIS_H2.md/config.yaml, which are hash-protected but not parsed.",
+  "Corrected comparison window start dates (2 January 2015, 1 August 2018); only their best Sharpe values are mapped.",
+  "Chronology times and commit hashes other than the holdout-lock commit (see review/deviation_chronology.csv).",
+  "Regulatory figures (600-contract spot-month limit, 6,300-contract benchmark; see review/regulatory_check.md).",
+  "Figure 1 (archived chart pixels): visual comparison only.",
+  "PDF layout, margins and font size: recorded by paper/verification.json at build time; re-measured only if PyMuPDF is installed."
+ ],
+ "not_proven": [
+  "That the code reproduces these tables from raw inputs (requires licensed Databento data, NASS/CFTC/yfinance downloads and the pinned Python 3.11 environment; see README.md).",
+  "That no lookahead exists in the code, beyond the saved artifacts and the existing unit tests.",
+  "That the holdout was accessed only once, or that the trial log is complete outside the recorded project.",
+  "That the PDF pixels match the editable HTML, except where the optional PyMuPDF text check runs.",
+  "Executable fills, historical margin-call funding or profitable capacity."
+ ]
+}

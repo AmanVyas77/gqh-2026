@@ -1,0 +1,10 @@
+variant,root,status,trade_legs,traded_notional
+A,LE,range_available,194,66918114.82174444
+A,LE,unknown,8,6349424.080782758
+B,GF,range_available,188,92869543.574218
+B,GF,unknown,10,7344639.520285964
+B,LE,range_available,194,132849540.82818672
+B,LE,unknown,8,8092181.183169981
+B,ZC,range_available,191,22330619.88145973
+C,LE,range_available,120,43982064.38738169
+C,LE,unknown,8,6078136.215789568
