@@ -1,0 +1,43 @@
+# equity_pairs V2 - one amended experiment (frozen 2026-10-03, before any V2 fitting).
+# Designed AFTER observing the original pilot (NOT PROMISING). The V1 spec, snapshots,
+# and pilot results are preserved unchanged. config.yaml still governs the holdout guard.
+version: 2
+development: {first_formation_end: "2015-07-31", trading_start: "2015-08-03", end: "2024-10-02"}
+holdout_locked_from: "2024-10-03"          # never downloaded, never evaluated
+data:
+  prices: "yfinance Adj Close (split+dividend adjusted total-return series); no raw prices claimed"
+  request: {start: "2015-01-02", end_exclusive: "2024-10-03"}
+universe:
+  membership: "point-in-time reconstruction from pinned Wikipedia revisions (pilot/data.py)"
+  identity_check_former_members: true      # as in the pilot
+  eligibility: [complete_127_prices, positive_prices, nonzero_return_variance, stale_zero_volume, stale_identical_close_run_ge5, stale_zero_return_share_gt_10pct]
+  removed_vs_v1: [min_price_5, min_median_dollar_volume_20m]
+formation: {price_obs: 127, return_obs: 126, reform: monthly}
+selection:
+  distance: "mean squared difference of formation prices normalized by their first value"
+  neighbors_per_stock: 3
+  max_pairs: 10
+  shared_stocks: false
+  ranking: "ascending distance; ties by (A, B) ticker"
+  arms:
+    simple: "3 highest formation return-correlation neighbours across the eligible universe (primary)"
+    pca: "frozen V1 representation: 5-component SVD loadings, unit norm, average linkage, cut 0.7; 3 nearest within cluster"
+    sector: "3 highest-correlation neighbours within modern GICS sector; unlabelled former members get no candidates"
+  same_issuer_pairs: excluded
+  cointegration_gate: none
+trading:
+  spread: "log(adj_A) - log(adj_B)"
+  z: "(spread - formation mean) / formation std (ddof=1), fixed for the trading month"
+  entry: 2.0      # |z| >= 2 and < stop: short the high leg, buy the low leg
+  exit: 0.5
+  stop: 4.0       # no re-entry in that pair for the rest of the month
+  max_holding_sessions: 20   # time-exit signal 20 sessions after the entry signal
+  leg_weight: 0.05           # +5% / -5% NAV per active pair, rebalanced daily
+  max_gross: 1.0
+  execution: "signal at close t -> execute at close t+1; new weights earn returns from t+1 close onward"
+  scheduled: "liquidation at each trading month's last close and at 2024-10-02 close (predetermined; overrides signals)"
+  cash_rate: 0.0
+costs:
+  trade_bps: 10              # per traded dollar, both legs, all rebalancing
+  borrow_annual: 0.03        # on short MV at the prior close, accrued per calendar day / 365
+  stress_multiplier: 2.0     # doubles both

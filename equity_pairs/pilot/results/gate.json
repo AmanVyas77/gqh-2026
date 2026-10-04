@@ -1,0 +1,9 @@
+{
+ "verdict": "NOT PROMISING",
+ "n_formations": 12,
+ "formations_below_300_eligible": 0,
+ "formations_with_ge5_pca_pairs": 1,
+ "formations_pca_cand_overlap_gt_90pct_with_corr": 0,
+ "redundancy_flag": false,
+ "pipeline_seconds": 70.3
+}

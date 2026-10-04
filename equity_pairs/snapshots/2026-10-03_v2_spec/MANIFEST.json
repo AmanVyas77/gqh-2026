@@ -1,0 +1,10 @@
+{
+  "label": "v2_spec",
+  "created_utc": "2026-10-04T02:31:35Z",
+  "created_ny": "2026-10-03 22:31:35 EDT",
+  "purpose": "V2 amended experiment frozen before any V2 fitting; designed after the V1 pilot.",
+  "files": {
+    "spec_v2.yaml": "88bcd9a7cd59c0dc32f048ead31413836b2c891f205a08311453a3c8d42e84df",
+    "SPEC_V2.md": "a7b4f3d59548ed0dbba0a4a262f6cdf3e30d40c30a7705969047d0335df022b7"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "label": "prompt1_preregistration",
+  "created_utc": "2026-10-04T02:01:57Z",
+  "created_ny": "2026-10-03 22:01:57 EDT",
+  "purpose": "Frozen first specification before any real-data download or fit. Boundary dates provisional (XNYS calendar); Prompt 2 must freeze them via amendment before downloading.",
+  "files": {
+    "HYPOTHESIS.md": "1922b9af75c5b1718f04a2c5efb8f5e9ddb657405aadc38e23f2b524d9c750f9",
+    "config.yaml": "71955e2f077b7f1aba5e1c880345d84a3e723b497067b17dcddb5ed463df11db"
+  },
+  "supporting_files_sha256": {
+    "split.py": "575cdb21cdbe305f8f2110ea8851f13f712a5f2fd5d561a07ae6f478d3a1a032",
+    "guard.py": "d32b4c0392d98e6ac057cb95a87301be7d3c0a045355c4858af7359cda8c123b",
+    "spec.py": "bdf37612c00666189b549301a2816465ad7a270765d7cee2b69c4b99bd1e1cbd",
+    "requirements.txt": "fed59608713d397dde8b8636ea58e8ca5ded6f3edeed5c507f56ad48626e0464",
+    "requirements-lock.txt": "02bd19b4ce38cd2f4e7a4b4d8b6cd1a852d8f3e42caa453d08afce55649b6800"
+  },
+  "hypothesis_as_received_sha256": "8c94b0bba394919d09512def9620d10178b990de6ea36a8e88b41e74be7dee20",
+  "python": "3.11.7",
+  "repo_git_head_for_context": "b6c06826e1ba83ac7116ad241e81940bfd20a147",
+  "data_used": "none"
+}

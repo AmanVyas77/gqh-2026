@@ -1,0 +1,87 @@
+{
+ "project": "equity_pairs",
+ "prompt": 2,
+ "written_utc": "2026-10-04T02:20:47Z",
+ "sources": [
+  {
+   "name": "Wikipedia - List of S&P 500 companies",
+   "use": "current constituents (503), modern GICS sector, SEC CIK",
+   "url": "https://en.wikipedia.org/w/index.php?title=List_of_S%26P_500_companies&oldid=1376729338",
+   "revid": 1376729338,
+   "revision_timestamp": "2026-09-25T22:49:33Z",
+   "retrieved_utc": "2026-10-04T02:11:57Z",
+   "sha256": "36346ab286bee0b9b4f9732ccea2f278be3452f830cc0524273404a0a57e43ac",
+   "local_copy": "data/raw/sources/wikipedia_sp500.html (gitignored)",
+   "limitations": [
+    "sector labels are modern GICS, not point-in-time",
+    "crowd-maintained; not an official S&P record"
+   ]
+  },
+  {
+   "name": "Wikipedia - Historical components of the S&P 500",
+   "use": "index changes for point-in-time membership reconstruction",
+   "url": "https://en.wikipedia.org/w/index.php?title=Historical_components_of_the_S%26P_500&oldid=1376064088",
+   "revid": 1376064088,
+   "revision_timestamp": "2026-09-21T20:49:21Z",
+   "retrieved_utc": "2026-10-04T02:12:13Z",
+   "sha256": "b233c74243daf075ed5da1027fca3f30b111f914847a4591e4fd075a3823e34b",
+   "coverage_evidence": "409 change rows 1976-07-01..2026-09-21; reconstructed membership 505-508 names at each pilot formation end (index has ~503-505 securities)",
+   "limitations": [
+    "completeness unverified; ticker renames not recorded",
+    "removed tickers may since have been reused",
+    "no identifiers beyond ticker and name"
+   ]
+  },
+  {
+   "name": "Yahoo Finance via yfinance 1.7.0",
+   "use": "pilot-window daily OHLCV, Adj Close, dividends, splits, history metadata",
+   "request": "Ticker(t).history(start='2015-01-30', end='2016-07-01', auto_adjust=False, actions=True, repair=False)",
+   "endpoint_semantics": "end exclusive: probe MMM 2015-01-28..2015-02-03 returned last date 2015-02-02",
+   "retrieved_utc_window": "2026-10-04T02:14:13Z..02:15:11Z (approx.; 58 s fetch ending 3 min 23 s after the 02:11:48Z timer start)",
+   "requested_tickers": 536,
+   "tickers_with_rows": 417,
+   "max_date_returned": "2016-06-30",
+   "local_copy": "data/raw/prices_pilot.pkl, prices_pilot_meta.csv (gitignored)",
+   "prices_pilot_pkl_sha256": "bea7745778e99d7b1aa47c5ebd8da0429dcb1f309403a0ddfc9c8a7240517f93",
+   "adjustment_conventions": {
+    "Close": "split-adjusted, NOT as-traded (AAPL 2015-07-31 Close 30.325 vs as-traded 121.30)",
+    "Adj Close": "split- and dividend-adjusted; matches (Close+Div)/Close_prev returns to p99 1.8e-05",
+    "Volume": "split-adjusted (Close x Volume = as-traded dollar volume)",
+    "Stock Splits": "includes spin-off price adjustments encoded as fractional splits (e.g. EBAY 2.376 on 2015-07-20, BAX 1.841 on 2015-07-01)"
+   },
+   "limitations": [
+    "no as-traded prices; raw-close $5 rule applied to split-adjusted Close (conflict)",
+    "former S&P members largely absent (115 former-member tickers returned no rows)",
+    "levels embed later split events including holdout-period ones",
+    "terms of use restrict redistribution; raw data not committed"
+   ]
+  },
+  {
+   "name": "Existing financial-data connector (MCP)",
+   "use": "not used",
+   "finding": "schema offers historical S&P 500 constituents and non-split-adjusted EOD prices, but only via interactive per-symbol tool calls; not scriptable from repo code; plan/licence unknown"
+  }
+ ],
+ "identifiers": {
+  "permanent_security_id": "none available free; Yahoo ticker used (symbol fallback)",
+  "issuer_id": "SEC CIK for current members; normalized Wikipedia security name for former members",
+  "share_class_groups_excluded_from_pairing": [
+   [
+    "GOOG",
+    "GOOGL"
+   ],
+   [
+    "NWS",
+    "NWSA"
+   ]
+  ]
+ },
+ "delisted_coverage": "poor: former members mostly missing from Yahoo; excluded and counted per formation (no_yahoo_data)",
+ "reproduce": [
+  "cd equity_pairs",
+  ".venv/bin/python -m pip install -r requirements-lock.txt",
+  "(Wikipedia pages: fetch the oldid URLs above into data/raw/sources/)",
+  ".venv/bin/python pilot/data.py",
+  ".venv/bin/python pilot/run.py"
+ ]
+}

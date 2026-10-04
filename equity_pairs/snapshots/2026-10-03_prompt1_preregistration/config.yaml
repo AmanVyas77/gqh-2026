@@ -1,22 +1,17 @@
 # equity_pairs/config.yaml - FROZEN FIRST SPECIFICATION (Prompt 1, 2026-10-03)
 # These are pre-registered research choices, not proven-optimal settings. There are
 # no competing algorithms and no parameter searches.
-# HYPOTHESIS.md (operational section) explains the choices. Its machine-checked
-# `spec-check` block must agree with this file. Any substantive conflict fails
-# closed: guard.py and the pilot refuse to run until the two are reconciled.
+# HYPOTHESIS.md explains the choices; this file governs every number.
 # Any change after the Prompt 1 snapshot is an amendment: take a new dated, hashed
 # snapshot and add a research_log.csv row. tests/test_config_consistency.py fails
 # if this file's SHA-256 does not appear in research_log.csv.
 
 project:
   name: equity_pairs
-  stage: prompt_2_sources_frozen
-  config_status: frozen_prompt1_amended
+  stage: prompt_1_preregistered
+  config_status: frozen_prompt1
   frozen_at_utc: "2026-10-04T02:01:35Z"
-  snapshot_dir: snapshots/2026-10-03_prompt1_preregistration   # original; preserved unchanged
-  amendments:
-    - {snapshot: snapshots/2026-10-03_prompt1_corrections, what: "exact holdout split (no month snap); MOC liquidation convention; pooled-summary and attribution wording; fail-closed spec consistency"}
-  spec_consistency: "fail closed: guard.py and pipelines raise while HYPOTHESIS.md spec-check conflicts with this file"
+  snapshot_dir: snapshots/2026-10-03_prompt1_preregistration
   representation_change:
     date: "2026-10-03"
     from: "direct clustering of stocks' formation-window daily return series (original brief)"
@@ -39,16 +34,13 @@ timeline:
   formation_return_obs: 126              # daily returns per formation window
   warmup_rule: "first formation end = first month-end session with >= 127 sessions from the data start"
   min_development_months: 36
-  boundary_status: frozen                # unresolved | provisional | frozen; loaders refuse unless frozen
-  boundary_frozen_at_utc: "2026-10-04T02:13:35Z"      # Prompt 2, before any price request; data start 2015-01-02 kept (source history predates it; pilot fetch verifies)
+  boundary_status: provisional           # unresolved | provisional | frozen; loaders refuse unless frozen
   boundary_resolution: >-
     Prompt 2 confirms the data start from source metadata (no prices), recomputes
     with split.py, sets boundary_status to frozen via a logged amendment and a new
-    snapshot, and only then requests prices. A later data start can only move the
-    boundary later, so 2024-10-03 is the earliest possible holdout start.
+    snapshot, and only then downloads. A later data start can only move the boundary
+    later, so 2024-10-01 is the earliest possible holdout start.
   # Provisional values below are computed by split.py from the XNYS calendar.
-  session_convention: "XNYS sessions identified by New York calendar date"
-  evaluation_window: "sessions strictly after first_formation_end through evaluation_end (inclusive)"
   first_formation_end: "2015-07-31"
   evaluation_start: "2015-08-03"
   evaluation_end: "2026-10-02"
@@ -57,29 +49,23 @@ timeline:
     fraction: 0.20
     fraction_rounding: ceil
     max_calendar_years: 2
-    years_rule: "evaluation sessions in the half-open window (evaluation_end - 2 calendar years, evaluation_end]"
-    size_rule: "holdout = exactly the last H evaluation sessions, H = min(ceil(0.20 * n_evaluation_sessions), sessions in the 2-year window)"
-    month_snap: none                     # monthly formation never lengthens the holdout
-    bounds: "[start, end], both inclusive"
+    years_rule: "evaluation sessions strictly after evaluation_end minus 2 calendar years"
+    size_rule: "H = min(ceil(0.20 * n_evaluation_sessions), sessions in the 2-year window)"
+    month_snap: "start at the first session of the month containing the raw boundary (snaps earlier; never smaller than the rule)"
     sessions_fraction_rule: 562
     sessions_years_rule: 501
     binding_rule: years
-    start: "2024-10-03"
+    raw_start: "2024-10-03"
+    start: "2024-10-01"
     end: "2026-10-02"
-    n_sessions: 501
+    n_sessions: 503
     starts_flat: true
   development:
-    bounds: "[start, end], both inclusive; end = session immediately before holdout.start"
     start: "2015-08-03"
-    end: "2024-10-02"
-    n_sessions: 2308
-    n_months: 111                          # calendar months containing development sessions; 2024-10 is a 2-session stub
-    positions_close_before_boundary: true  # predetermined MOC liquidation at the 2024-10-02 close
-  trading_windows: >-
-    calendar months intersected with each segment, so the boundary splits October 2024
-    into a development stub (2024-10-01..02) and a holdout stub (2024-10-03..31). Each
-    window's formation ends at the session immediately before the window's first session
-    (normally the prior month end; 2024-10-02 for the holdout stub).
+    end: "2024-09-30"
+    n_sessions: 2306
+    n_months: 110
+    positions_close_before_boundary: true  # month-end liquidation at the close of 2024-09-30
   inheritance: none                        # no other project's cutoff is used
 
 # ---------------------------------------------------------------- B. universe
@@ -87,15 +73,13 @@ universe:
   index: "S&P 500"
   membership_preference: point_in_time_including_former_members_with_price_histories
   membership_fallback: dated_current_constituent_snapshot   # explicitly survivorship-biased exploratory experiment
-  membership_source: "Wikipedia 'Historical components of the S&P 500' revid 1376064088 (changes table, 409 rows, 1976-07-01..2026-09-21) + 'List of S&P 500 companies' revid 1376729338 (503 current constituents)"
-  membership_method: "members at formation end = current list with every change dated after the formation end reversed (remove added ticker, restore removed ticker)"
-  membership_basis: point_in_time_reconstructed   # survivorship-biased wherever former members lack Yahoo price history
-  membership_snapshot_date: "2026-10-04T02:12:13Z"  # retrieval time of the pinned revisions
+  membership_source: null                 # Prompt 2 (15-minute discovery timebox)
+  membership_snapshot_date: null          # required if the fallback is used
   membership_test: "index member as of the formation-end session"
   identifiers:
-    permanent_id: none_available          # no free permanent security id; Yahoo ticker used (symbol fallback)
+    permanent_id: null                    # source permanent security id if available (e.g. PERMNO-like)
     permanent_id_fallback: "ticker as of formation end; symbol fallback is logged"
-    issuer_id: "SEC CIK for current members; normalized security name (class/share words removed) for former members"
+    issuer_id: null                       # for share-class exclusion (e.g. PERMCO-like)
     issuer_id_fallback: "manual dual-class issuer map written from the constituent list before any price download"
   eligibility:                            # formation-time information only
     complete_price_obs: 127
@@ -109,32 +93,19 @@ universe:
       max_zero_return_share: 0.10         # exclude if > 10% of the 126 returns are exactly zero
     exclude_same_issuer_pairs: true
     uses_future_information: false        # never filter on later survival or later data completeness
-  sector_label_vintage: modern            # current GICS from Wikipedia; former members have no label and get no sector-arm candidates
+  sector_label_vintage: null              # point_in_time | modern (disclose modern labels)
 
 data:
-  price_source: "Yahoo Finance via yfinance 1.7.0: Ticker.history(start, end, auto_adjust=False, actions=True, repair=False); end exclusive (validated by probe)"
-  source_conventions:                     # frozen before any price request
-    close: "split-adjusted, NOT as-traded"
-    adj_close: "split- and dividend-adjusted (Yahoo multiplicative dividend factor)"
-    volume: "split-adjusted"
-    returns: "Adj Close ratios; deviates from data.return_formula (raw prices unavailable); difference is second order on ex-dates"
-    formation_price_index: "Adj Close / Adj Close at the first formation session"
-    dollar_volume: "Close x Volume (both split-adjusted) = as-traded dollar volume up to rounding"
-    min_price_filter: "applied to split-adjusted Close: CONFLICT with the raw-close rule (stricter for later forward splits; embeds future split events)"
-    raw_reconstruction: none              # not attempted: would need post-window (incl. holdout) split history
-    former_member_identity: "exclude a former-member ticker if Yahoo firstTradeDate is after its window start or its Yahoo name shares no token (len>=3, minus corp/inc/company/the/group/holdings/class/ltd/plc/co) with the Wikipedia security name"
-    missing_prices: "no fill: any missing session in a window excludes the stock (complete_price_obs)"
-    bh_family: "union candidates with a finite p-value; numerically degenerate pairs are rejected before BH"
-  pilot_download: {first_date: "2015-01-30", last_date: "2016-06-30", request_end_exclusive: "2016-07-01"}
+  price_source: null                      # Prompt 2
   required_fields: [raw_open, raw_close, raw_volume, split_ratio, cash_dividend, sector, index_membership]
   raw_price_convention: >-
     as-traded prices. If the source supplies split-adjusted prices, reconstruct raw
     prices with the source's split ledger and log the convention.
   return_formula: "r_t = k_t * (P_t + D_t) / P_{t-1} - 1 (P raw close; k_t split ratio effective at ex-date t, else 1; D_t cash dividend per post-split share with ex-date t)"
   formation_price_index: "TR_t = cumulative product of (1 + r) from 1.0 at the first formation session; window-local, no later adjustments"
-  sector_source: "Wikipedia 'List of S&P 500 companies' revid 1376729338, GICS Sector (modern labels)"
+  sector_source: null
   raw_dir: data/raw
-  max_download_date: "2024-10-02"         # = development.end (inclusive); guard.py refuses everything until the boundary is frozen
+  max_download_date: "2024-09-30"         # = development.end; enforced by guard.py once the boundary is frozen
 
 # ---------------------------------------------------------------- C. PCA + clustering
 features:
@@ -239,16 +210,9 @@ trading:
   direction: "z >= +2: short spread (short A, long B); z <= -2: long spread (long A, short B)"
   signal_time: close
   fill_time: next_session_open            # raw open; no fill-time re-check of z
-  trading_window: "see timeline.trading_windows"
-  signal_sessions: "closes of sessions 1..K-1 of the trading window; signals at the session-K close are ignored"
-  signal_execution: "every signal-driven entry, exit, stop, or time exit fills at the next session's raw open; no signal fills at the close it was computed from"
-  scheduled_liquidation: >-
-    predetermined market-on-close orders on each trading window's last session,
-    fixed by the calendar before the window starts and independent of any signal;
-    modeled at that session's closing price plus transaction costs
-  close_price_caveat: "historical closing prices are execution proxies, not guaranteed MOC fills"
-  development_end_liquidation: "predetermined MOC liquidation at the 2024-10-02 close; no position enters the holdout"
-  conventions_identical_across_arms: true
+  trading_window: "calendar month after the formation end"
+  signal_sessions: "closes of sessions 1..K-1 of the trading month; signals at the session-K close are ignored"
+  month_end: "all open positions are liquidated at the close of the trading month's last session (scheduled), then reform"
   precedence: [stop, convergence_exit, time_exit]
   holding_count: "the entry-fill session counts as 1; time exit is signalled at the close where the count reaches 20"
   re_entry_after_stop: "none in that pair for the rest of the trading month"
@@ -303,7 +267,7 @@ pilot:
 # ---------------------------------------------------------------- later validation (defined; not run in Prompt 2)
 validation:
   confirmatory_sample: holdout
-  pooled_summary: "full walk-forward (development + holdout) is a descriptive pooled summary only, not a second independent confirmation of the holdout"
+  secondary_sample: "full walk-forward (development + holdout); confirmatory only if no amendment follows any view of development returns"
   monthly_return: "compounded daily net NAV return within each calendar month"
   q1_convergence:
     unit: "each executed entry in an arm's selected pairs"
@@ -335,7 +299,6 @@ validation:
     alpha: 0.05
     cost_stress: "mean monthly net return under stress_multiplier costs must be > 0 (point estimate, CI reported) to support economic robustness"
     attribution:
-      role: "limited exposure diagnostics; cannot show returns are unexplained by standard asset-pricing factors, nor prove the liquidity-provision mechanism"
       frequency: daily
       model_market: "r_t = a + b * MKT_t + e_t; MKT = equal-weighted eligible-universe return"
       model_sector: "r_t = a + sum_s b_s * SEC_s,t + e_t; SEC_s = equal-weighted eligible return of sector s"

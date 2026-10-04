@@ -1,0 +1,17 @@
+{
+  "label": "prompt1_corrections",
+  "created_utc": "2026-10-04T02:11:40Z",
+  "created_ny": "2026-10-03 22:11:40 EDT",
+  "purpose": "Pre-data Prompt 1 corrections (user instruction): exact holdout split without month snapping; explicit MOC liquidation convention; pooled-summary and attribution wording; fail-closed config/hypothesis consistency. Boundary still provisional. No data used.",
+  "supersedes_but_preserves": "snapshots/2026-10-03_prompt1_preregistration",
+  "files": {
+    "HYPOTHESIS.md": "737caef8ccbbbfbba48b104cef85b2a1ac19a010b3d67dde0b4a3ede8a980b96",
+    "config.yaml": "50bc10bb6b8e1b8d3f7a22414bfc99b7872ab60c647efd958e7af62f5481ad21"
+  },
+  "supporting_files_sha256": {
+    "split.py": "16d597b844f059bb74e6911bf38e98b8abbc6fcbd2d3a75d504857368304968b",
+    "guard.py": "9de12da8e9df37ff075818f7499ed7b2d79003161d6b8f594ef303fad48a7e55",
+    "spec.py": "5659b8375b03a2c81e018b45c8cbb5753c14f4a380b91c2210aa097e8d0411cd"
+  },
+  "data_used": "none"
+}

@@ -1,0 +1,14 @@
+{
+  "label": "prompt2_boundary_freeze",
+  "created_utc": "2026-10-04T02:13:35Z",
+  "created_ny": "2026-10-03 22:13:35 EDT",
+  "purpose": "Boundary frozen and source-dependent choices fixed before any price request. No prices fetched yet.",
+  "files": {
+    "config.yaml": "356c20e9b391cfcdf2adc05363b0e1d490c4ded90c3683b6aede9c4c971ccde0",
+    "HYPOTHESIS.md": "737caef8ccbbbfbba48b104cef85b2a1ac19a010b3d67dde0b4a3ede8a980b96"
+  },
+  "source_files_sha256": {
+    "wikipedia_sp500.html": "36346ab286bee0b9b4f9732ccea2f278be3452f830cc0524273404a0a57e43ac",
+    "wikipedia_sp500_history.html": "b233c74243daf075ed5da1027fca3f30b111f914847a4591e4fd075a3823e34b"
+  }
+}

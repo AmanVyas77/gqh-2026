@@ -1,0 +1,10 @@
+{
+  "label": "hypothesis_as_received",
+  "created_utc": "2026-10-04T01:55:08Z",
+  "created_ny": "2026-10-03 21:55:08 EDT",
+  "purpose": "User-authored HYPOTHESIS.md exactly as received at the start of Prompt 1, before any agent edits.",
+  "source_file_mtime_ny": "2026-10-03 20:31:14 EDT",
+  "files": {
+    "HYPOTHESIS.md": "8c94b0bba394919d09512def9620d10178b990de6ea36a8e88b41e74be7dee20"
+  }
+}

@@ -1,0 +1,11 @@
+# equity_pairs - Python 3.11.7 (project-local .venv). Full resolved set: requirements-lock.txt
+numpy==2.4.6
+scipy==1.17.1
+pandas==3.0.6
+statsmodels==0.15.0
+PyYAML==6.0.3
+exchange_calendars==4.13.2
+yfinance==1.7.0
+lxml==6.1.3
+pytest==9.1.1
+# scikit-learn: not installed and not required (PCA via numpy SVD; clustering via scipy)

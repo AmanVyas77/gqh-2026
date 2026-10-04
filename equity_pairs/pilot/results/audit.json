@@ -1,0 +1,248 @@
+{
+ "union_tickers": 536,
+ "with_rows": 417,
+ "without_rows_current_members": [
+  "DOW",
+  "FOX",
+  "FOXA",
+  "SNDK"
+ ],
+ "n_without_rows_former_members": 115,
+ "dates_not_xnys_sessions": [],
+ "xnys_sessions_with_no_data_at_all": [],
+ "n_xnys_sessions_in_window": 358,
+ "split_events": [
+  {
+   "ticker": "BAX",
+   "date": "2015-07-01",
+   "ratio": 1.841,
+   "close_change_on_split_day": 0.023
+  },
+  {
+   "ticker": "CF",
+   "date": "2015-06-18",
+   "ratio": 5.0,
+   "close_change_on_split_day": 0.0144
+  },
+  {
+   "ticker": "CNC",
+   "date": "2015-02-20",
+   "ratio": 2.0,
+   "close_change_on_split_day": -0.008
+  },
+  {
+   "ticker": "DRI",
+   "date": "2015-11-10",
+   "ratio": 1.1186933661483387,
+   "close_change_on_split_day": -0.0031
+  },
+  {
+   "ticker": "EBAY",
+   "date": "2015-07-20",
+   "ratio": 2.376,
+   "close_change_on_split_day": 0.024
+  },
+  {
+   "ticker": "EW",
+   "date": "2015-12-14",
+   "ratio": 2.0,
+   "close_change_on_split_day": 0.0085
+  },
+  {
+   "ticker": "GOOG",
+   "date": "2015-04-27",
+   "ratio": 1.0027455,
+   "close_change_on_split_day": -0.0145
+  },
+  {
+   "ticker": "GPN",
+   "date": "2015-11-03",
+   "ratio": 2.0,
+   "close_change_on_split_day": -0.0081
+  },
+  {
+   "ticker": "HPQ",
+   "date": "2015-11-02",
+   "ratio": 2.202,
+   "close_change_on_split_day": 0.1296
+  },
+  {
+   "ticker": "HRL",
+   "date": "2016-02-10",
+   "ratio": 2.0,
+   "close_change_on_split_day": 0.0058
+  },
+  {
+   "ticker": "KR",
+   "date": "2015-07-14",
+   "ratio": 2.0,
+   "close_change_on_split_day": -0.0071
+  },
+  {
+   "ticker": "MAS",
+   "date": "2015-07-01",
+   "ratio": 1.138,
+   "close_change_on_split_day": 0.0143
+  },
+  {
+   "ticker": "MPC",
+   "date": "2015-06-11",
+   "ratio": 2.0,
+   "close_change_on_split_day": 0.0223
+  },
+  {
+   "ticker": "NFLX",
+   "date": "2015-07-15",
+   "ratio": 7.0,
+   "close_change_on_split_day": -0.0223
+  },
+  {
+   "ticker": "NI",
+   "date": "2015-07-02",
+   "ratio": 2.545,
+   "close_change_on_split_day": -0.0486
+  },
+  {
+   "ticker": "NKE",
+   "date": "2015-12-24",
+   "ratio": 2.0,
+   "close_change_on_split_day": -0.0183
+  },
+  {
+   "ticker": "OXY",
+   "date": "2016-02-25",
+   "ratio": 1.0017028949213662,
+   "close_change_on_split_day": 0.0043
+  },
+  {
+   "ticker": "PPG",
+   "date": "2015-06-15",
+   "ratio": 2.0,
+   "close_change_on_split_day": -0.0102
+  },
+  {
+   "ticker": "PPL",
+   "date": "2015-06-02",
+   "ratio": 1.0736525660296328,
+   "close_change_on_split_day": -0.0177
+  },
+  {
+   "ticker": "ROST",
+   "date": "2015-06-12",
+   "ratio": 2.0,
+   "close_change_on_split_day": -0.0082
+  },
+  {
+   "ticker": "SBUX",
+   "date": "2015-04-09",
+   "ratio": 2.0,
+   "close_change_on_split_day": 0.0072
+  },
+  {
+   "ticker": "UA",
+   "date": "2016-06-13",
+   "ratio": 1.007098,
+   "close_change_on_split_day": -0.0241
+  },
+  {
+   "ticker": "UAA",
+   "date": "2016-04-08",
+   "ratio": 2.0,
+   "close_change_on_split_day": 0.0129
+  },
+  {
+   "ticker": "V",
+   "date": "2015-03-19",
+   "ratio": 4.0,
+   "close_change_on_split_day": -0.0016
+  },
+  {
+   "ticker": "VTR",
+   "date": "2015-08-18",
+   "ratio": 0.8757,
+   "close_change_on_split_day": -0.2357
+  }
+ ],
+ "adj_vs_close_plus_dividend_return_abs_diff": {
+  "n": 148186,
+  "p99": 1.7974475684295584e-05,
+  "p999": 0.00021211688480862742,
+  "max": 0.003440531332822072,
+  "n_over_1e-3": 10
+ },
+ "adj_returns_over_25pct": [
+  {
+   "ticker": "FCX",
+   "date": "2015-08-27",
+   "adj_return": 0.2866
+  },
+  {
+   "ticker": "FOSL",
+   "date": "2015-11-13",
+   "adj_return": -0.365
+  },
+  {
+   "ticker": "FOSL",
+   "date": "2016-02-17",
+   "adj_return": 0.2855
+  },
+  {
+   "ticker": "FOSL",
+   "date": "2016-05-11",
+   "adj_return": -0.2908
+  },
+  {
+   "ticker": "PWR",
+   "date": "2015-10-16",
+   "adj_return": -0.285
+  },
+  {
+   "ticker": "TRIP",
+   "date": "2015-10-14",
+   "adj_return": 0.2554
+  },
+  {
+   "ticker": "WMB",
+   "date": "2015-06-22",
+   "adj_return": 0.259
+  },
+  {
+   "ticker": "WMB",
+   "date": "2016-01-14",
+   "adj_return": 0.3439
+  },
+  {
+   "ticker": "WMB",
+   "date": "2016-02-08",
+   "adj_return": -0.3481
+  }
+ ],
+ "aapl_close_2015_07_31": 30.325000762939453,
+ "aapl_as_traded_close_2015_07_31_reference": 121.3,
+ "near_identical_return_series_corr_gt_0.995": [],
+ "max_date_in_data": "2016-06-30",
+ "share_class_groups_excluded_from_pairing": [
+  [
+   "GOOG",
+   "GOOGL"
+  ],
+  [
+   "NWS",
+   "NWSA"
+  ]
+ ],
+ "no_sector_label_former_members_per_formation": {
+  "2015-07-31": 62,
+  "2015-08-31": 62,
+  "2015-09-30": 62,
+  "2015-10-30": 62,
+  "2015-11-30": 62,
+  "2015-12-31": 62,
+  "2016-01-29": 61,
+  "2016-02-29": 61,
+  "2016-03-31": 61,
+  "2016-04-29": 59,
+  "2016-05-31": 62,
+  "2016-06-30": 62
+ }
+}

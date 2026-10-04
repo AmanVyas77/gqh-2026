@@ -1,0 +1,68 @@
+[
+ {
+  "from": "2015-07-31",
+  "to": "2015-08-31",
+  "jaccard_pca_passing": 0.0,
+  "jaccard_pca_selected": 0.0
+ },
+ {
+  "from": "2015-08-31",
+  "to": "2015-09-30",
+  "jaccard_pca_passing": null,
+  "jaccard_pca_selected": null
+ },
+ {
+  "from": "2015-09-30",
+  "to": "2015-10-30",
+  "jaccard_pca_passing": null,
+  "jaccard_pca_selected": null
+ },
+ {
+  "from": "2015-10-30",
+  "to": "2015-11-30",
+  "jaccard_pca_passing": null,
+  "jaccard_pca_selected": null
+ },
+ {
+  "from": "2015-11-30",
+  "to": "2015-12-31",
+  "jaccard_pca_passing": null,
+  "jaccard_pca_selected": null
+ },
+ {
+  "from": "2015-12-31",
+  "to": "2016-01-29",
+  "jaccard_pca_passing": null,
+  "jaccard_pca_selected": null
+ },
+ {
+  "from": "2016-01-29",
+  "to": "2016-02-29",
+  "jaccard_pca_passing": null,
+  "jaccard_pca_selected": null
+ },
+ {
+  "from": "2016-02-29",
+  "to": "2016-03-31",
+  "jaccard_pca_passing": 0.0,
+  "jaccard_pca_selected": 0.0
+ },
+ {
+  "from": "2016-03-31",
+  "to": "2016-04-29",
+  "jaccard_pca_passing": 0.0,
+  "jaccard_pca_selected": 0.0
+ },
+ {
+  "from": "2016-04-29",
+  "to": "2016-05-31",
+  "jaccard_pca_passing": 0.0,
+  "jaccard_pca_selected": 0.0
+ },
+ {
+  "from": "2016-05-31",
+  "to": "2016-06-30",
+  "jaccard_pca_passing": 0.0,
+  "jaccard_pca_selected": 0.0
+ }
+]

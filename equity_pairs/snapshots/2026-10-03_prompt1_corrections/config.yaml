@@ -10,7 +10,7 @@
 
 project:
   name: equity_pairs
-  stage: prompt_2_sources_frozen
+  stage: prompt_1_corrected
   config_status: frozen_prompt1_amended
   frozen_at_utc: "2026-10-04T02:01:35Z"
   snapshot_dir: snapshots/2026-10-03_prompt1_preregistration   # original; preserved unchanged
@@ -39,8 +39,7 @@ timeline:
   formation_return_obs: 126              # daily returns per formation window
   warmup_rule: "first formation end = first month-end session with >= 127 sessions from the data start"
   min_development_months: 36
-  boundary_status: frozen                # unresolved | provisional | frozen; loaders refuse unless frozen
-  boundary_frozen_at_utc: "2026-10-04T02:13:35Z"      # Prompt 2, before any price request; data start 2015-01-02 kept (source history predates it; pilot fetch verifies)
+  boundary_status: provisional           # unresolved | provisional | frozen; loaders refuse unless frozen
   boundary_resolution: >-
     Prompt 2 confirms the data start from source metadata (no prices), recomputes
     with split.py, sets boundary_status to frozen via a logged amendment and a new
@@ -87,15 +86,13 @@ universe:
   index: "S&P 500"
   membership_preference: point_in_time_including_former_members_with_price_histories
   membership_fallback: dated_current_constituent_snapshot   # explicitly survivorship-biased exploratory experiment
-  membership_source: "Wikipedia 'Historical components of the S&P 500' revid 1376064088 (changes table, 409 rows, 1976-07-01..2026-09-21) + 'List of S&P 500 companies' revid 1376729338 (503 current constituents)"
-  membership_method: "members at formation end = current list with every change dated after the formation end reversed (remove added ticker, restore removed ticker)"
-  membership_basis: point_in_time_reconstructed   # survivorship-biased wherever former members lack Yahoo price history
-  membership_snapshot_date: "2026-10-04T02:12:13Z"  # retrieval time of the pinned revisions
+  membership_source: null                 # Prompt 2 (15-minute discovery timebox)
+  membership_snapshot_date: null          # required if the fallback is used
   membership_test: "index member as of the formation-end session"
   identifiers:
-    permanent_id: none_available          # no free permanent security id; Yahoo ticker used (symbol fallback)
+    permanent_id: null                    # source permanent security id if available (e.g. PERMNO-like)
     permanent_id_fallback: "ticker as of formation end; symbol fallback is logged"
-    issuer_id: "SEC CIK for current members; normalized security name (class/share words removed) for former members"
+    issuer_id: null                       # for share-class exclusion (e.g. PERMCO-like)
     issuer_id_fallback: "manual dual-class issuer map written from the constituent list before any price download"
   eligibility:                            # formation-time information only
     complete_price_obs: 127
@@ -109,30 +106,17 @@ universe:
       max_zero_return_share: 0.10         # exclude if > 10% of the 126 returns are exactly zero
     exclude_same_issuer_pairs: true
     uses_future_information: false        # never filter on later survival or later data completeness
-  sector_label_vintage: modern            # current GICS from Wikipedia; former members have no label and get no sector-arm candidates
+  sector_label_vintage: null              # point_in_time | modern (disclose modern labels)
 
 data:
-  price_source: "Yahoo Finance via yfinance 1.7.0: Ticker.history(start, end, auto_adjust=False, actions=True, repair=False); end exclusive (validated by probe)"
-  source_conventions:                     # frozen before any price request
-    close: "split-adjusted, NOT as-traded"
-    adj_close: "split- and dividend-adjusted (Yahoo multiplicative dividend factor)"
-    volume: "split-adjusted"
-    returns: "Adj Close ratios; deviates from data.return_formula (raw prices unavailable); difference is second order on ex-dates"
-    formation_price_index: "Adj Close / Adj Close at the first formation session"
-    dollar_volume: "Close x Volume (both split-adjusted) = as-traded dollar volume up to rounding"
-    min_price_filter: "applied to split-adjusted Close: CONFLICT with the raw-close rule (stricter for later forward splits; embeds future split events)"
-    raw_reconstruction: none              # not attempted: would need post-window (incl. holdout) split history
-    former_member_identity: "exclude a former-member ticker if Yahoo firstTradeDate is after its window start or its Yahoo name shares no token (len>=3, minus corp/inc/company/the/group/holdings/class/ltd/plc/co) with the Wikipedia security name"
-    missing_prices: "no fill: any missing session in a window excludes the stock (complete_price_obs)"
-    bh_family: "union candidates with a finite p-value; numerically degenerate pairs are rejected before BH"
-  pilot_download: {first_date: "2015-01-30", last_date: "2016-06-30", request_end_exclusive: "2016-07-01"}
+  price_source: null                      # Prompt 2
   required_fields: [raw_open, raw_close, raw_volume, split_ratio, cash_dividend, sector, index_membership]
   raw_price_convention: >-
     as-traded prices. If the source supplies split-adjusted prices, reconstruct raw
     prices with the source's split ledger and log the convention.
   return_formula: "r_t = k_t * (P_t + D_t) / P_{t-1} - 1 (P raw close; k_t split ratio effective at ex-date t, else 1; D_t cash dividend per post-split share with ex-date t)"
   formation_price_index: "TR_t = cumulative product of (1 + r) from 1.0 at the first formation session; window-local, no later adjustments"
-  sector_source: "Wikipedia 'List of S&P 500 companies' revid 1376729338, GICS Sector (modern labels)"
+  sector_source: null
   raw_dir: data/raw
   max_download_date: "2024-10-02"         # = development.end (inclusive); guard.py refuses everything until the boundary is frozen
 

@@ -20,9 +20,11 @@ Before doing anything in this project, read this file and then `STATUS.md`.
 
 | Prompt | Purpose |
 |---|---|
-| 0 | Isolate and set up the project |
-| 1 | Pre-register the hypothesis, method, baselines, and stop/go criteria; freeze the config |
-| 2 | Audit the data, then run a bounded **development-only** structural feasibility pilot |
+| 0 | Isolate and set up the project (done 2026-10-03) |
+| 1 | Pre-register the hypothesis, method, baselines, and stop/go criteria; freeze the config (done 2026-10-03) |
+| 2 | Audit the data, then run a bounded **development-only** structural feasibility pilot. This means formation diagnostics only, within a 45-minute timebox; the gate is frozen in `config.yaml` under `pilot` |
+
+The frozen specification is in `HYPOTHESIS.md` (prose, plus a machine-checked `spec-check` block) and `config.yaml` (the numbers). A substantive conflict between them fails closed: `guard.py` and every pipeline refuse to run until the two are reconciled. Do not change either file without a logged amendment and a new snapshot. The tests fail if a live file's hash is missing from the log.
 
 - Run only the prompt the user has issued. Do not advance automatically, even when the next step looks obvious.
 - **Stop after Prompt 2 for human review.** If the pilot fails the frozen feasibility criteria, end this specification. Record the failure in `STATUS.md`. Do not tweak the setup and rerun.
@@ -37,6 +39,8 @@ Before doing anything in this project, read this file and then `STATUS.md`.
    - Do no analysis, clustering, pair selection, or performance evaluation on holdout data.
    - Every download call must pass an explicit end date before the holdout start. Check the provider's end-date semantics (in yfinance, `end` is exclusive).
    - The loader must also assert that the maximum returned date is before the holdout start.
+   - Every loader must call `guard.check_request(...)` before fetching and `guard.check_dates(...)` afterwards.
+   - The guard refuses everything until `timeline.boundary_status` is `frozen`. Freezing the boundary is a logged amendment, and it must happen before any price download.
 4. **No look-ahead.** Fit transformations (standardization, PCA), clusters, pair-selection statistics, hedge ratios, and z-score parameters only on the formation window that precedes each trading window.
 5. **Correlation alone does not establish mean reversion.** A pair is tradable only if its spread passes the pre-registered stationarity and mean-reversion tests. Whether those properties persist beyond the formation window must itself be tested.
 6. **Baselines.** Compare clustering against both of the following, each built inside this project and run through identical downstream rules (tests, hedge ratios, entry/exit, sizing, and costs):
@@ -56,4 +60,4 @@ Before doing anything in this project, read this file and then `STATUS.md`.
 
 ## Environment
 
-Use the repository-root `.venv` (Python 3.11.7). `CONTEXT.md` lists the installed and missing packages. Do not install packages into the shared environment without the user's approval.
+Use the project-local `equity_pairs/.venv` (Python 3.11.7; pins in `requirements.txt` and `requirements-lock.txt`). Never modify the shared root `.venv`. Run the tests with `.venv/bin/python -m pytest` from this folder.
