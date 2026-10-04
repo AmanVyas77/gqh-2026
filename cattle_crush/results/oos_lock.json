@@ -1,0 +1,10 @@
+{
+  "config_sha256": "ef37283b9a3362b5c1749b3cff858a51d9ad511936955b1a650703ca0c80fb51",
+  "git_commit": "58d6299b03db01a0d38e405c670c10c8641cb4c0",
+  "timestamp_utc": "2026-10-04T04:45:01+00:00",
+  "oos_start": "2024-10-01",
+  "frozen_primaries": {
+    "H1": "Variant A, primary spec",
+    "H2": "primary specification"
+  }
+}

@@ -4,10 +4,12 @@
 returns on deferred Live Cattle futures? **H2 (pre-registered follow-up):** do Tyson and Texas
 Roadhouse, hedged with their sector ETFs, react with a lag to cattle price moves?
 
-**Status:** development work is complete and both hypotheses are **not supported** for their frozen
-primary specifications (H1: P1 t = 0.42, P2 net Sharpe −0.08; H2: Q1 t = 0.10, Q2 t = 0.88, net
-Sharpe −0.29). The holdout (trading dates from 2024-10-01) is **locked and not yet evaluated**. Draft
-note: [`note/research_note.pdf`](note/research_note.pdf) (4 pages).
+**Status:** both hypotheses are **not supported** for their frozen primary specifications. In
+development, H1 failed P1 (t = 0.42) and P2's in-sample condition (net Sharpe −0.08), and H2 failed Q1,
+Q2 and Q3 (t = 0.10, 0.88, −1.08). The two-year holdout (2024-10-01 to 2026-10-02) was **evaluated once on
+2026-10-04** (lock at commit `58d6299`): H1's primary earned a net Sharpe of **+0.63** (meeting P2's holdout
+condition; H1 remains rejected because P1 and P2's in-sample condition failed) and H2's primary earned
+**−0.15** (Q3 not met). Note: [`note/research_note.pdf`](note/research_note.pdf) (4 pages).
 
 | File | Purpose |
 |---|---|
@@ -90,20 +92,24 @@ published at each date; returns are computed within each contract (no spliced se
 tick plus $2.50 per contract per side; H2 5 bps (stocks) and 2 bps (ETFs) per side plus 0.50%/yr borrow;
 all results are also reported at 2× costs.
 
-## Holdout evaluation: PENDING (not run)
+## Holdout evaluation: completed once (2026-10-04)
 
-The two frozen primaries (H1 Variant A primary; H2 primary) are evaluated **once**, on trading dates from
-2024-10-01, and both are reported regardless of outcome. H1 Variants B and C and the drawdown overlay are
-reported alongside as pre-registered secondary results.
+`run_oos.py --confirm-final --yes` evaluated the two frozen primaries once on trading dates from 2024-10-01
+to 2026-10-02 (504 days). `results/oos_lock.json` records config SHA-256 `ef37283b…`, git commit `58d6299`
+and the lock time (2026-10-04 04:45:01 UTC), written before any holdout result was computed. A first
+attempt stopped on a Databento HTTP 502 during the data download, before the lock and before any result;
+the re-run completed. Outputs: `results/tables/oos_performance.csv`, `results/figures/oos_equity.png`, and 7
+`oos` rows in `results/trial_log.csv`.
 
-1. Commit the frozen specification (`run_oos.py` refuses a first run while code, config, hypotheses,
-   manual reference data or `SUBMISSION_FREEZE.md` have uncommitted changes).
-2. `python run_oos.py --confirm-final` runs the checks and prints the holdout Databento cost, then stops.
-3. `python run_oos.py --confirm-final --yes` buys the holdout data (Databento, CFTC, a full-history H2
-   equity re-download), writes `results/oos_lock.json` (config hash, git commit, time) **before any
-   holdout result is computed**, then writes `results/tables/oos_performance.csv` and
-   `results/figures/oos_equity.png`.
-4. Pass conditions: P2 requires H1's holdout net Sharpe > 0; Q3 requires H2's holdout net Sharpe > 0.
-5. Later runs are allowed only if `config.yaml` is unchanged (reproduction).
+| Holdout, net of 1× costs | Ann. return | Sharpe | Max DD | Monthly mean (NW t) | Condition |
+|---|---:|---:|---:|---:|---|
+| **H1 primary (Variant A)** | +3.88% | **+0.63** | 5.5% | +0.31% (0.97) | P2 holdout: Sharpe > 0, met |
+| **H2 primary** | −1.03% | **−0.15** | 7.6% | −0.08% (−0.27) | Q3 holdout: Sharpe > 0, not met |
+| H1 Variant B (secondary) | +8.03% | +0.86 | 6.5% | +0.64% (1.40) | reported, not substituted |
+| H1 Variant C (secondary) | +2.14% | +0.43 | 5.6% | +0.17% (0.80) | reported, not substituted |
 
-No holdout results exist in this repository yet.
+P2 required both its in-sample condition (failed) and the holdout condition, and P1 had failed, so H1
+remains rejected under the pre-registered decision table. A two-year Sharpe has a standard error of about
+0.7, so +0.63 is not statistically distinguishable from zero.
+
+`python run_oos.py` now only reproduces this evaluation, and only while `config.yaml` matches the lock.
