@@ -293,3 +293,17 @@ def backtest_variant(variant: str, zcol: str = "z", overlay: bool = False, kind:
 
 def backtest_a(zcol: str = "z", **kwargs) -> tuple[Result, dict]:
     return backtest_variant("A", zcol, **kwargs)
+
+
+def backtest_long_only_le(sig: pd.DataFrame, market: Market) -> Result:
+    """Factor-check series (Section 8 additional checks, not a trial): long 1x capital in the
+    sale contract at every month-end, rolled with the same rule and execution as Variant A.
+    Logged to the trial log as a diagnostic."""
+    capital = load_config()["capital_base"]
+    rbs = [Rebalance(t, {"LE": (r["sale_contract"], capital / (r["sale_price"] * market.size["LE"]))}, weight=1.0)
+           for t, r in sig.iterrows()]
+    res = run(market, rbs, capital)
+    m = analysis.metrics(res.daily, "gross", capital)
+    trial_log.log_trial("A", {"factor": "long_only_le", "w": 1}, (m["start"], m["end"]), m["sharpe"], m["n_days"],
+                        m["skew_daily"], m["kurt_daily"], kind="diagnostic", spec="factor_long_only_le")
+    return res

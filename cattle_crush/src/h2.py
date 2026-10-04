@@ -8,7 +8,7 @@ import pandas as pd
 import statsmodels.api as sm
 
 from src import analysis, contracts, trial_log
-from src.config import RAW, load_config, oos_start
+from src.config import RAW, RAW_OOS, load_config, oos_start
 
 PAIRS = {"TSN": "XLP", "TXRH": "XLY"}            # stock -> sector hedge
 COST_BPS = {"TSN": 5.0, "TXRH": 5.0, "XLP": 2.0, "XLY": 2.0}
@@ -17,23 +17,26 @@ TARGET_VOL, CLIP_DIV, MAX_W, GROSS_CAP = 0.10, 2.0, 2.0, 2.0
 BETA_DAYS, VOL_DAYS, SIG_LOOKBACK, LE_MIN_DAYS, NW_LAGS = 252, 60, 36, 45, 2
 
 
-def equities() -> pd.DataFrame:
-    df = pd.read_parquet(RAW / "h2_equities.parquet").set_index("date").sort_index()
-    if df.index.max() >= oos_start():
+def equities(oos: bool = False) -> pd.DataFrame:
+    """Development: data/raw/h2_equities.parquet (ends before oos_start). Holdout (run_oos.py only):
+    data/raw/oos/h2_equities.parquet, a full-history re-download made at holdout time so that all
+    prices share one dividend/split adjustment."""
+    df = pd.read_parquet((RAW_OOS if oos else RAW) / "h2_equities.parquet").set_index("date").sort_index()
+    if not oos and df.index.max() >= oos_start():
         raise RuntimeError("H2 equity data includes dates on or after oos_start")
     return df
 
 
-def cattle_signal() -> pd.DataFrame:
+def cattle_signal(oos: bool = False) -> pd.DataFrame:
     """Per LE month-end e: the contract chosen at the prior month-end b (first with last trading
     day >= b + 45 days), its return from b to e, sigma over the 36 prior months, and s = r / sigma."""
-    s = contracts.settlements("LE").query("~cash_final")
+    s = contracts.settlements("LE", oos).query("~cash_final")
     px = s.set_index(["date", "contract"])["price"]
     dates = pd.Series(sorted(s["date"].unique()))
     month_ends = dates.groupby(dates.dt.to_period("M")).max().tolist()
     rows = []
     for b, e in zip(month_ends[:-1], month_ends[1:]):
-        c = contracts.select("LE", b, LE_MIN_DAYS)["contract"]
+        c = contracts.select("LE", b, LE_MIN_DAYS, oos)["contract"]
         if (e, c) not in px.index:
             raise RuntimeError(f"{c} has no settlement at month-end {e.date()}")
         rows.append({"month_end": e, "base_date": b, "contract": c, "r_le": px[(e, c)] / px[(b, c)] - 1})
@@ -139,14 +142,17 @@ def nw(y: pd.Series, x: pd.Series | None = None, lags: int = NW_LAGS) -> dict:
     return {"beta": beta, "t_nw": t, "n": len(d), "first": str(d.index.min()), "last": str(d.index.max()), "r2": r2}
 
 
-def evaluate(log: bool = True) -> dict:
+def evaluate(log: bool = True, oos: bool = False) -> dict:
+    """Primary specification. oos=True (run_oos.py only) simulates through the end of the holdout
+    data and reports performance for dates on or after oos_start; Q1/Q2 are development tests."""
     cfg = load_config()
     capital = cfg["capital_base"]
-    px = equities()
+    px = equities(oos)
     rets = px.pct_change().iloc[1:]
-    sig = cattle_signal()
+    sig = cattle_signal(oos)
     rb = rebalances(sig, rets, capital)
-    daily, contrib = run(rb, rets, capital)
+    daily_all, contrib = run(rb, rets, capital)
+    daily = daily_all[daily_all["date"] >= oos_start()].reset_index(drop=True) if oos else daily_all
 
     # Pre-registered tests (Section 6)
     hb = basket_monthly(rets, sig)
@@ -185,6 +191,7 @@ def evaluate(log: bool = True) -> dict:
     annual = daily.set_index("date")[["gross", "net", "net2x"]].groupby(lambda d: d.year).sum()
 
     # Concentration
+    contrib = contrib[contrib.index >= daily["date"].min()]
     by_asset = contrib.sum() / capital
     by_pair = {stk: by_asset[stk] + by_asset[sec] for stk, sec in PAIRS.items()}
     mon = daily.set_index("date")["pnl"].groupby(lambda d: d.to_period("M")).sum() / capital
@@ -194,7 +201,7 @@ def evaluate(log: bool = True) -> dict:
             "gross_pnl_total": float(mon.sum()), "gross_pnl_ex_top3_abs_months": float(mon.drop(top.index[:3]).sum()),
             "hit_rate_months": float((mon > 0).mean())}
 
-    out = {"signal": sig, "rebalances": rb, "daily": daily, "contrib": contrib, "basket_monthly": hb,
+    out = {"signal": sig, "rebalances": rb, "daily": daily, "daily_all": daily_all, "contrib": contrib, "basket_monthly": hb,
            "tests": tests, "performance": performance, "exposure": exposure, "annual": annual,
            "concentration": conc}
     if log:
@@ -203,5 +210,5 @@ def evaluate(log: bool = True) -> dict:
         trial_log.log_trial("H2", {"spec": "primary", "signal": "1-month LE return / 36m sd", "hedge": "sector ETFs"},
                             (daily["date"].iloc[0].date(), daily["date"].iloc[-1].date()),
                             performance["net"]["sharpe"], len(r), float(stats.skew(r)),
-                            float(stats.kurtosis(r, fisher=False)), kind="trial", spec="primary")
+                            float(stats.kurtosis(r, fisher=False)), kind="oos" if oos else "trial", spec="primary")
     return out

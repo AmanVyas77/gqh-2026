@@ -1,0 +1,2 @@
+# Optional: renders note/research_note.pdf (python note/build_note.py)
+pymupdf==1.28.2

@@ -1,0 +1,7 @@
+aum,sharpe_net,ann_return_net,impact_drag_per_year,note
+1000000.0,-0.11400170058789724,-0.007320695959902376,0.0019218335477174946,"net Sharpe at $1M is negative, so the half-Sharpe AUM is undefined"
+10000000.0,-0.17866802730830522,-0.011476233706694051,0.006077371294509174,"net Sharpe at $1M is negative, so the half-Sharpe AUM is undefined"
+50000000.0,-0.29481405623296864,-0.018988277751213284,0.013589415339028407,"net Sharpe at $1M is negative, so the half-Sharpe AUM is undefined"
+100000000.0,-0.38071015128209984,-0.02461719788935983,0.01921833547717494,"net Sharpe at $1M is negative, so the half-Sharpe AUM is undefined"
+500000000.0,-0.7236292039621891,-0.04837236695354392,0.042973504541359044,"net Sharpe at $1M is negative, so the half-Sharpe AUM is undefined"
+1000000000.0,-0.9509596207818758,-0.06617257535727661,0.06077371294509174,"net Sharpe at $1M is negative, so the half-Sharpe AUM is undefined"

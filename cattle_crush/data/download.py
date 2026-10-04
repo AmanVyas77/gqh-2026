@@ -396,9 +396,11 @@ H2_TICKERS = ["TSN", "TXRH", "XLP", "XLY"]
 
 def pull_h2_equities(cfg: dict, oos: bool = False) -> None:
     """Daily split- and dividend-adjusted closes for H2 (HYPOTHESIS_H2.md Section 3).
-    Development window 2009-01-01 to oos_start - 1 day; yfinance `end` is exclusive."""
+    Development: 2009-01-01 to oos_start - 1 day (yfinance `end` is exclusive). Holdout
+    (run_oos.py only): the full history from 2009-01-01 to today, re-downloaded so every price
+    carries the same adjustment, written to data/raw/oos/."""
     import yfinance as yf
-    start = oos_start(cfg) if oos else pd.Timestamp("2009-01-01")
+    start = pd.Timestamp("2009-01-01")
     end = _window(cfg, oos)[1]
     frames = {}
     for tk in H2_TICKERS:
@@ -438,7 +440,7 @@ def main() -> None:
         ap.print_help()
         return
 
-    sources = ["databento", "nass", "cftc", "spy"] if "all" in args.pull else args.pull
+    sources = ["databento", "nass", "cftc", "spy", "h2"] if "all" in args.pull else args.pull
     if "databento" in sources:
         databento_estimate(cfg)
         if not args.yes:

@@ -1,0 +1,82 @@
+<h1>Feedlot Margins, Cattle Prices and Beef-Exposed Equities: Two Pre-Registered Tests</h1>
+<p class="sub">Gator Quant Hacks 2026 &middot; Systematic Trading Track &middot; [team names] &middot; Draft research note, development results only (holdout locked)</p>
+
+<div class="box">
+<p><b>Summary.</b> We pre-registered two hypotheses linking cattle markets to tradable returns and tested each frozen primary specification on development data (2010&ndash;2024-09). The holdout (trading dates from 2024-10-01) is locked and has not been evaluated.</p>
+<ul>
+<li><b>H1 (main study):</b> deeply negative feedlot margins did not predict fewer cattle placements (P1: &beta; = +0.0020 per s.d., Newey-West t = 0.42), and the primary trading rule earned a net Sharpe ratio of &minus;0.08 (P2: mean monthly net return &minus;0.045%, t = &minus;0.34). By the pre-registered decision table, H1 is <b>rejected</b> for this specification.</li>
+<li><b>H2 (follow-up):</b> Tyson and Texas Roadhouse, hedged with their sector ETFs, showed no same-month cattle exposure (Q1: t = +0.10) and no lagged reaction (Q2: t = +0.88); the primary rule earned a net Sharpe ratio of &minus;0.29. H2 is <b>rejected</b> for this specification.</li>
+<li>Across the 25 cattle-project trials, full-sample development net Sharpe ratios range from &minus;0.42 to +0.21; no monthly-return t-statistic exceeds 0.86.</li>
+</ul>
+<p>These results show no support for the tested specifications. They are not evidence that every cattle-related strategy is unprofitable.</p>
+</div>
+
+<h2>1. Economic mechanisms and hypotheses</h2>
+<p><b>H1: feeding margins and Live Cattle futures.</b> A feedlot buys an 800 lb feeder steer, feeds it about 64 bushels of corn and sells it at 1,400 lb roughly five months later. The projected margin is M<sub>t</sub> = 1,400 &times; LE<sub>t</sub> &minus; 800 &times; FC<sub>t</sub> &minus; 64.29 &times; C<sub>t</sub> &minus; $350, using CME settlements of a Live Cattle contract expiring at least 150 days out, the nearest Feeder Cattle contract with 30 days left and a corn contract at least 75 days out. Two channels could make low margins bullish for deferred cattle futures: low margins cut placements, so fewer fed cattle reach market five to six months later; and hedging feedlots pay speculators a premium to carry price risk (Keynes 1930; de Roon, Nijman &amp; Veld 2000). The signal is z<sub>t</sub>, the margin's distance from its mean over the 36 prior month-ends in standard deviations (the $350 non-corn cost cancels). Tests: <b>P1</b> low z predicts fewer placements over months t+1..t+3; <b>P2</b> the primary rule (Variant A: w = clip(&minus;z/2, &minus;1, 1) &times; 10% / &sigma;&#770;, |w| &le; 2, long or short the deferred contract) earns a positive in-sample net return with t &gt; 2 and a positive holdout Sharpe; <b>P3</b> the kill test asks whether z predicts the realized spot change but not the futures return, meaning the curve already prices the supply response. Variants B (the full margin spread) and C (A filtered by commercial hedging pressure) are pre-registered secondary rules.</p>
+<p><b>H2: cattle prices and beef-buying equities.</b> Cattle are a major input for Tyson (beef segment) and Texas Roadhouse (largest commodity cost). If equity investors underreact to cost news that originates in a separate market (Cohen &amp; Frazzini 2008; Menzly &amp; Ozbas 2010), a rise in cattle prices this month should predict sector-relative underperformance next month. The signal is s<sub>t</sub>, the month's front Live Cattle return divided by its standard deviation over the 36 prior months. Each stock is hedged with its sector ETF (XLP, XLY) at a 252-day beta; the position is w = &minus;clip(s/2, &minus;1, 1) &times; 10% / &sigma;&#770;<sub>basket</sub>. Tests: <b>Q1</b> same-month exposure (&beta; &lt; 0, t &lt; &minus;2); <b>Q2</b> next-month predictability (&beta; &lt; 0, t &lt; &minus;2); <b>Q3</b> positive net returns with t &gt; 2 in-sample and a positive holdout Sharpe.</p>
+<p><b>Timeline.</b> H1 was committed on 2026-10-02 before any backtest; its deviation log has 21 dated entries, each recorded before the results it affects. H2 was conceived after H1 failed and committed on 2026-10-03 before any equity data was loaded; its implementation choices were logged before fitting.</p>
+
+<h2>2. Data, publication timing and execution</h2>
+<table>
+<tr><th>Source</th><th>Used for</th><th>Timing used in tests</th></tr>
+<tr><td>Databento GLBX.MDP3 (CME Globex): definitions, final settlements, daily bars for LE, GF, ZC</td><td>Margin, prices, P&amp;L, limit-lock test, ADV</td><td>Signal on month-end settlement t; trade at the next day's settlement. Contract expiries from exchange definitions as published at t.</td></tr>
+<tr><td>USDA NASS Cattle on Feed (feedlots 1,000+ head)</td><td>P1 outcome only</td><td>Dated by reference month (revised values); outcomes restricted to months before 2024-10.</td></tr>
+<tr><td>CFTC Disaggregated COT, Live Cattle (producer/merchant positions)</td><td>Variant C filter</td><td>Known from as-of date + 6 days (+8 in holiday weeks); reports delayed by the 2013 and 2018&ndash;19 shutdowns and the 2023 ION incident held to CFTC-announced dates.</td></tr>
+<tr><td>yfinance adjusted closes: TSN, TXRH, XLP, XLY; SPY</td><td>H2 returns; H1 factor check</td><td>Signal on the month-end LE settlement; trade at the next NYSE close.</td></tr>
+</table>
+<p><b>Accounting.</b> Capital is a fixed $1M; returns are excess returns with no interest on collateral; futures positions use fractional contracts. P&amp;L accrues within each contract (no spliced series); rolls close and reopen at one settlement and pay costs on both legs. A trade is deferred if any leg is limit-locked (official session high = low) or missing from the feed. H1 costs are one tick plus $2.50 per contract per side; H2 costs are 5 bps per side on stocks, 2 bps on ETFs and 0.50% a year borrow on short notional. Every result is net of costs, with a 2&times; cost stress.</p>
+<p><b>Development verification.</b> All H1 executions occurred one trading day after the signal, except one Variant B order deferred one extra day. Charged costs match the tick arithmetic for every trade. Variant A's gross exposure stayed below 2&times; capital (maximum 1.99&times;); Variant B is uncapped by design and reached 5.5&times;. H2 executed one NYSE day after each signal; stock-plus-hedge gross peaked at 1.74&times; and no single stock exceeded 0.43&times;. Known feed gaps (eight LE/GF days, two ZC days, a missing LEZ2014 final settlement) are treated as non-trading days, never forward-filled; every development output ends on or before 2024-09-30. H1 trades 2013-07-01 to 2024-09-30 (2,834 days); H2 trades 2013-08-01 to 2024-09-30 (2,810 days) from <b>134 monthly signals</b>, which are overlapping-information monthly decisions rather than independent observations.</p>
+
+<h2>3. H1 primary findings and trial summary</h2>
+<table>
+<tr><th>Test (pre-registered)</th><th>Estimate</th><th>NW t</th><th>n</th><th>Result</th></tr>
+<tr><td>P1: placements YoY (t+1..t+3) on z, 3 lags</td><td>&beta; = +0.0020 per s.d.</td><td>0.42</td><td>133 month-ends</td><td>Fail (needs &beta;&gt;0, t&gt;2)</td></tr>
+<tr><td>P2: Variant A mean monthly net return, 5 lags</td><td>&minus;0.045%</td><td>&minus;0.34</td><td>135 months</td><td>Fail (in-sample)</td></tr>
+<tr><td>P3 (i): sale-contract return to expiry on z, 6 lags</td><td>&beta; = &minus;0.0087</td><td>&minus;0.65</td><td>127</td><td>Futures not predicted</td></tr>
+<tr><td>P3 (ii): spot change on z, 6 lags</td><td>&beta; = +$0.020/lb</td><td>1.10</td><td>127</td><td>Spot not predicted (wrong sign)</td></tr>
+</table>
+<table>
+<tr><th>Run (net of 1&times; costs unless noted)</th><th>Ann. return</th><th>Ann. vol</th><th>Sharpe</th><th>Max DD</th><th>Turnover/yr</th></tr>
+<tr><td><b>Variant A primary, net</b></td><td>&minus;0.54%</td><td>6.4%</td><td><b>&minus;0.08</b></td><td>25.5%</td><td>6.5&times;</td></tr>
+<tr><td>Variant A primary, gross / 2&times; costs</td><td>&minus;0.39% / &minus;0.69%</td><td>6.4%</td><td>&minus;0.06 / &minus;0.11</td><td>24.4% / 26.8%</td><td>6.5&times;</td></tr>
+<tr><td>Variant A with drawdown overlay (pre-declared report)</td><td>&minus;0.92%</td><td>5.0%</td><td>&minus;0.18</td><td>20.7%</td><td>4.9&times;</td></tr>
+<tr><td>Variant B, crush spread (secondary)</td><td>&minus;1.94%</td><td>7.0%</td><td>&minus;0.28</td><td>38.1%</td><td>23.4&times;</td></tr>
+<tr><td>Variant C, hedging-pressure filter (secondary)</td><td>&minus;0.18%</td><td>4.8%</td><td>&minus;0.04</td><td>20.3%</td><td>4.4&times;</td></tr>
+</table>
+<img src="equity.png" width="420">
+<p class="cap">Figure 1. H1 primary (Variant A), cumulative return on fixed capital, 2013-07 to 2024-09: gross, net, net at 2&times; costs, and the pre-declared drawdown overlay.</p>
+<p><b>Why it failed.</b> When z &lt; &minus;1 (15 month-ends), the margin recovered by +$153 per head over five months, almost entirely through the Live Cattle leg (+$156). But that leg compares different contract months at t and t+5; P3 shows that neither the held contract's return nor the realized spot change was predictable from z. A pre-declared diagnostic finds that the calendar-seasonal component of the margin alone explains 74% of Variant A's monthly return variance over 2018&ndash;2024 (81% for C), while an LE-price-only version explains 4%. An exploratory diagnostic (not a test) found that the LE-price z alone carried a negative association with placements (t = &minus;3.31), consistent with the cattle cycle; no strategy was built on it.</p>
+
+<h2>4. H2 primary findings and costs</h2>
+<table>
+<tr><th>Test (pre-registered, NW 2 lags)</th><th>&beta;</th><th>NW t</th><th>n</th><th>Result</th></tr>
+<tr><td>Q1: monthly hedged basket return on same-month LE return</td><td>+0.0098</td><td>0.10</td><td>170 months</td><td>Fail: no exposure (wrong sign)</td></tr>
+<tr><td>Q2: next month's hedged basket return on s<sub>t</sub></td><td>+0.0036</td><td>0.88</td><td>134 monthly signals</td><td>Fail (wrong sign)</td></tr>
+<tr><td>Q3: mean monthly net return (in-sample)</td><td>&minus;0.15%</td><td>&minus;1.08</td><td>134 months</td><td>Fail</td></tr>
+</table>
+<table>
+<tr><th>H2 primary</th><th>Ann. return</th><th>Ann. vol</th><th>Sharpe</th><th>Max DD from peak</th><th>Max loss below initial NAV</th></tr>
+<tr><td>Gross</td><td>&minus;1.49%</td><td>6.4%</td><td>&minus;0.23</td><td>28.7%</td><td>&minus;26.1%</td></tr>
+<tr><td><b>Net</b></td><td>&minus;1.84%</td><td>6.4%</td><td><b>&minus;0.29</b></td><td>30.8%</td><td>&minus;28.9%</td></tr>
+<tr><td>2&times; costs</td><td>&minus;2.20%</td><td>6.4%</td><td>&minus;0.34</td><td>33.2%</td><td>&minus;31.6%</td></tr>
+</table>
+<p><b>Costs and exposure.</b> Turnover was 6.9&times; capital a year; trading costs cost 0.25% a year and borrow 0.11% a year. Average gross exposure (stocks plus hedges) was 0.42&times; capital, average stock exposure 0.23&times; and net exposure close to zero. Only 10 of the 134 monthly signals were at full conviction (|s| &ge; 2), so the rule usually ran well below its 10% volatility target. <b>Concentration:</b> of the &minus;16.6% cumulative gross P&amp;L, the TXRH pair contributed &minus;12.1% and the TSN pair &minus;4.5%; the largest months were March 2020 (&minus;7.8%), October 2015 (&minus;7.1%) and December 2023 (+6.1%); excluding the three largest months, cumulative P&amp;L is still &minus;7.8%, with 51% of months positive. <b>Benchmark:</b> H2's benchmark is each stock's sector. Held long, the sector-hedged basket earned +0.52% a month (t = 1.57), so the stocks beat their sectors on average; timing them with the cattle signal lost money.</p>
+<img src="by_year.png" width="430">
+<p class="cap">Figure 2. Calendar-year net returns of the two primary specifications (2013 and 2024 partial years).</p>
+
+<h2>5. Robustness, uncertainty, limitations and conclusion</h2>
+<img src="robustness.png" width="360">
+<p class="cap">Figure 3. H1 one-at-a-time robustness (21 alternative specifications plus the 3 primaries), net Sharpe on the common window from 2014-07-01; the seasonal-adjustment specification can only start in 2018-07.</p>
+<p><b>Robustness.</b> Changing the z lookback (24, 48 months), sale horizon (120, 180 days), feed conversion (5.5, 6.5) or seasonal adjustment moved full-sample net Sharpe ratios between &minus;0.42 and +0.21 (up to +0.22 on the common window), with no monthly t-statistic above 0.86. The overlay and 2&times; costs leave the conclusion unchanged.</p>
+<table>
+<tr><th>Deflated Sharpe ratio (25 cattle-project trials)</th><th>Net Sharpe</th><th>PSR (vs 0)</th><th>DSR</th></tr>
+<tr><td>H1 primary (Variant A)</td><td>&minus;0.08</td><td>0.39</td><td>0.09</td></tr>
+<tr><td>H2 primary</td><td>&minus;0.29</td><td>0.17</td><td>0.02</td></tr>
+<tr><td>Best of the 25 trials (H1 Variant B, seasonal adjustment)</td><td>+0.21</td><td>0.70</td><td>0.40</td></tr>
+</table>
+<p>The calculation covers the 25 distinct cattle-project trials (24 for H1, 1 for H2; expected maximum Sharpe under the null 0.31 a year). It does not cover other experiments in the team's repository, which also holds separate GLP-1 equity, equity pairs-trading and macro-equity studies; those are disclosed here but not counted. <b>Other checks:</b> regressing Variant A on long-only cattle, 12-month cattle momentum and SPY gives alpha &minus;1.0% a year (t = &minus;0.64, R&sup2; = 0.08). Stress: Variant A lost 5.5% in the March&ndash;May 2020 packer shutdowns and 1.4% around the August 2019 Holcomb plant fire; H2 lost 9.9% in March&ndash;May 2020. Two consecutive Live Cattle limit moves (8.50 then 12.75 cents/lb) at the 2&times; leverage cap would cost 22.9% of capital. Variant A's median position was 0.11% of 20-day volume and 1.9% initial margin-to-equity; under the square-root impact model, net Sharpe falls from &minus;0.11 at $1M to &minus;0.95 at $1B.</p>
+<p><b>Limitations.</b> Small samples (15 month-ends with z &lt; &minus;1; 134 monthly H2 signals); feed gaps and missing final settlements in the futures data; inferred final settlements before 2017; revised placement data; current exchange margins applied historically; a two-stock H2 universe exposed to idiosyncratic events and survivorship. <b>Not completed:</b> H2's four registered alternative trials, its Fama-French factor regression and its liquidity analysis; CME exchange-set position limits for LE; a whole-pipeline perturbation test for look-ahead; an Iowa State closeout comparison of the margin's level. None of these is implied to have passed.</p>
+<p><b>Conclusion.</b> Neither pre-registered mechanism found support in the tested specifications: feedlot margins did not forecast placements or futures returns, and beef-exposed equities did not respond to cattle prices with a lag. We report this as a negative result. It does not establish that no cattle-related strategy is profitable.</p>
+<div class="box pending">
+<p><b>PENDING: HOLDOUT NOT YET EVALUATED.</b> The two frozen primaries (H1 Variant A; H2 primary) will be evaluated once on trading dates from 2024-10-01 with <code>python run_oos.py --confirm-final --yes</code>, which writes a lock before computing any holdout result. Both outcomes will be reported regardless of sign: P2 requires H1's holdout net Sharpe &gt; 0 and Q3 requires H2's holdout net Sharpe &gt; 0. No holdout results appear in this draft.</p>
+</div>

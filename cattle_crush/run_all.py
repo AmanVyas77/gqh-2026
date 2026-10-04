@@ -6,6 +6,7 @@ Usage: python run_all.py [--yes]   (--yes confirms the Databento purchase if raw
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -94,7 +95,7 @@ def main() -> None:
     print("\n[7] Deflated Sharpe Ratio")
     dsr = reports.dsr_report()
     dsr.to_csv(RESULTS / "tables" / "trials.csv", index=False)
-    print(dsr[["strategy", "sharpe_annual", "n_trials", "raw_logged_rows", "sr0_annual", "psr", "dsr"]]
+    print(dsr[["strategy", "sharpe_annual", "n_cattle_project_trials", "raw_logged_rows", "sr0_annual", "psr", "dsr"]]
           .to_string(index=False, float_format=lambda v: f"{v:.4f}"))
 
     print("\n[8] Stress tests and liquidity/capital")
@@ -107,11 +108,33 @@ def main() -> None:
 
     print("\n[9] H2 (HYPOTHESIS_H2.md): primary specification, development data only (logged)")
     out = h2.evaluate()
+    out["daily"].to_parquet(PROCESSED / "h2_daily.parquet", index=False)
+    out["rebalances"].to_parquet(PROCESSED / "h2_rebalances.parquet", index=False)
+    json.dump({"exposure": out["exposure"], "concentration": out["concentration"]},
+              open(RESULTS / "tables" / "h2_exposure_concentration.json", "w"), indent=2, default=float)
     pd.DataFrame(out["tests"]).T.to_csv(RESULTS / "tables" / "h2_tests.csv")
     pd.DataFrame(out["performance"]).T.to_csv(RESULTS / "tables" / "h2_performance.csv")
     out["annual"].to_csv(RESULTS / "tables" / "h2_annual.csv")
     for k, v in out["tests"].items():
         print(f"{k}: beta {v['beta']:+.5f}  NW t {v['t_nw']:+.2f}  n {v['n']}  pass={v['pass']}")
+
+    print("\n[10] Development accounting checks and pre-declared additional checks (not trials)")
+    reports.h1_accounting().to_csv(RESULTS / "tables" / "h1_accounting.csv", index=False)
+    fac = reports.factor_regression()                       # runs the long-only LE factor (logged, diagnostic)
+    fac.to_csv(RESULTS / "tables" / "factors.csv", index=False)
+    print(fac.to_string(index=False, float_format=lambda v: f"{v:.4f}"))
+    by_year = reports.returns_by_year()
+    by_year.to_csv(RESULTS / "tables" / "by_year.csv")
+    reports.plot_by_year(by_year, RESULTS / "figures" / "by_year.png")
+    cap_curve = reports.capacity_curve()
+    cap_curve.to_csv(RESULTS / "tables" / "capacity_curve.csv", index=False)
+    reports.plot_capacity(cap_curve, RESULTS / "figures" / "capacity.png")
+    reports.h2_episodes().to_csv(RESULTS / "tables" / "h2_stress_episodes.csv", index=False)
+    print("written: h1_accounting.csv, factors.csv, by_year.csv, capacity_curve.csv, h2_stress_episodes.csv")
+
+    print("\n[11] In-sample guard")
+    reports.assert_in_sample_outputs()
+    print("all development outputs end before oos_start; no holdout data read")
 
 def plot_equity(curves: dict, path, title: str = "Variant A (primary spec), in-sample") -> None:
     """Cumulative return on fixed capital, one line per curve (same units, one axis)."""
@@ -189,8 +212,10 @@ def variant_a(sig: pd.DataFrame) -> None:
               "Net 2x": prim.daily.set_index("date")["net2x"],
               "Overlay, net 1x": runs["overlay"][0].daily.set_index("date")["net"]}
     PROCESSED.mkdir(parents=True, exist_ok=True)
-    pd.concat({name: res.daily.set_index("date")[["gross", "net", "net2x"]] for name, (res, _) in runs.items()},
-              axis=1).to_parquet(PROCESSED / "variant_a_daily.parquet")
+    pd.concat({name: res.daily.set_index("date")[["gross", "net", "net2x", "gross_notional"]]
+               for name, (res, _) in runs.items()}, axis=1).to_parquet(PROCESSED / "variant_a_daily.parquet")
+    prim.trades.to_parquet(PROCESSED / "variant_a_trades.parquet", index=False)
+    prim.rebalances.to_parquet(PROCESSED / "variant_a_rebalances.parquet", index=False)
     plot_equity(curves, RESULTS / "figures" / "equity.png")
 
 
@@ -237,8 +262,10 @@ def variant_bc(variant: str, sig: pd.DataFrame) -> None:
               "Net 2x": prim.daily.set_index("date")["net2x"],
               "Overlay, net 1x": runs["overlay"][0].daily.set_index("date")["net"]}
     PROCESSED.mkdir(parents=True, exist_ok=True)
-    pd.concat({name: res.daily.set_index("date")[["gross", "net", "net2x"]] for name, (res, _) in runs.items()},
-              axis=1).to_parquet(PROCESSED / f"variant_{variant.lower()}_daily.parquet")
+    pd.concat({name: res.daily.set_index("date")[["gross", "net", "net2x", "gross_notional"]]
+               for name, (res, _) in runs.items()}, axis=1).to_parquet(PROCESSED / f"variant_{variant.lower()}_daily.parquet")
+    prim.trades.to_parquet(PROCESSED / f"variant_{variant.lower()}_trades.parquet", index=False)
+    prim.rebalances.to_parquet(PROCESSED / f"variant_{variant.lower()}_rebalances.parquet", index=False)
     names = {"B": "Variant B (crush spread, primary spec), in-sample",
              "C": "Variant C (A filtered by hedging pressure, primary spec), in-sample"}
     plot_equity(curves, RESULTS / "figures" / f"equity_{variant.lower()}.png", names[variant])

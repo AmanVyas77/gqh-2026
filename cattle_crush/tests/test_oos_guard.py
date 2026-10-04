@@ -41,3 +41,41 @@ def test_lock_refuses_changed_config(tmp_path):
     assert run_oos.check_lock(False, lock, "abc") == "repeat"
     with pytest.raises(SystemExit):
         run_oos.check_lock(True, lock, "different")
+
+
+@needs_data
+def test_holdout_code_path_on_development_data(tmp_path, monkeypatch):
+    """Exercises run_oos.evaluate_holdout end to end on DEVELOPMENT data only, so a coding error
+    surfaces before the one-time run. The boundary is moved to 2024-07-01 inside the evaluation
+    modules; data/raw/oos points at an empty temp dir (plus a copy of the development H2 file);
+    caches and the trial log go to temp paths. No holdout data exists or is read."""
+    import shutil
+
+    import pandas as pd
+
+    import src.config as config
+    from src import backtest, contracts as ct, h2
+    from src.config import load_config
+
+    fake_oos = tmp_path / "oos"
+    fake_oos.mkdir()
+    shutil.copy(ct.RAW / "h2_equities.parquet", fake_oos / "h2_equities.parquet")
+    cut = pd.Timestamp("2024-07-01")
+    for mod in (backtest, h2, run_oos):
+        monkeypatch.setattr(mod, "oos_start", lambda cfg=None: cut)
+    monkeypatch.setattr(ct, "RAW_OOS", fake_oos)
+    monkeypatch.setattr(config, "RAW_OOS", fake_oos)
+    monkeypatch.setattr(h2, "RAW_OOS", fake_oos)
+    monkeypatch.setattr(ct, "PROCESSED", tmp_path / "processed")
+    monkeypatch.setenv("CATTLE_TRIAL_LOG", str(tmp_path / "trial_log.csv"))
+
+    perf, curves = run_oos.evaluate_holdout(load_config())
+    roles = set(perf["role"])
+    assert {"PRIMARY (H1)", "PRIMARY (H2)"} <= roles
+    assert (pd.to_datetime(perf["start"]) >= cut).all()
+    assert (pd.to_datetime(perf["end"]) < oos_start()).all()      # development data only
+    assert {"H1 Variant A", "H2 primary"} <= set(curves)
+
+
+def test_frozen_paths_check_runs():
+    assert isinstance(run_oos.uncommitted_frozen_changes(), list)
