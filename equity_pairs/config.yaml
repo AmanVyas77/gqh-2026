@@ -1,0 +1,127 @@
+# equity_pairs/config.yaml — SKELETON (Prompt 0)
+# null = undecided. Prompt 1 fills these in and freezes a dated, hashed snapshot
+# before any real-data fitting. After the freeze, any change is an amendment:
+# take a new snapshot and add a timestamped row with the reason to research_log.csv.
+
+project:
+  name: equity_pairs
+  stage: prompt_0_setup
+  config_status: skeleton            # skeleton -> frozen (Prompt 1) -> amended_vN
+  frozen_at_utc: null
+  frozen_snapshot_sha256: null       # hash of the frozen snapshot file, not of this live file
+
+deadline:
+  submission: "2026-10-04T11:00:00-04:00"   # Sunday, America/New_York (EDT)
+  timezone: America/New_York
+  research_note_max_pages: 5
+  reproducible_code: true
+
+timeline:
+  evaluation_start: null             # first evaluated trading day (after the initial formation window)
+  evaluation_end: null               # last completed session in the evaluation period
+  data_start: null                   # evaluation_start minus the formation warm-up
+  holdout:
+    rule: "most recent min(fraction * evaluation period, max_years)"
+    fraction: 0.20
+    max_years: 2
+    start: null                      # computed in Prompt 1 from this strategy's own evaluation period
+    end: null
+  development:
+    start: null
+    end: null                        # strictly before holdout.start
+  boundary_rule: null                # handling of positions open at the dev/holdout boundary
+
+universe:
+  index: "S&P 500"
+  membership: null                   # point_in_time | current_constituents (survivorship-biased)
+  membership_source: null
+  delisted_prices_available: null
+  min_price_unadjusted: null
+  min_adv_usd: null
+  min_formation_coverage: null       # min fraction of formation days with valid returns
+
+data:
+  price_source: null
+  price_fields: null                 # e.g. adjusted close for returns, unadjusted close for filters
+  sector_source: null                # used by the sector baseline; point-in-time or current
+  raw_dir: data/raw
+  max_download_date: null            # hard guard during Prompts 0-2: must be before holdout.start
+
+formation:
+  window: {length: 6, unit: months}  # rolling; trading-day equivalent (~126) fixed in Prompt 1
+  roll_step: null
+  return_type: null                  # log | simple
+  missing_data_rule: null
+  fit_on: preceding_formation_window_only
+
+features:
+  transform: null                    # e.g. standardized returns -> PCA
+  n_components: null
+  covariance_shrinkage: null
+  remove_market_factor: null
+
+clustering:
+  method: null
+  params: {}
+  random_seed: null
+
+pair_selection:
+  candidate_scope: within_cluster
+  # correlation alone does not establish mean reversion; spread tests are required
+  cointegration_test: null
+  pvalue_threshold: null
+  multiple_testing_control: null
+  half_life_days: {min: null, max: null}
+  hurst_max: null
+  min_mean_crossings: null
+  max_pairs: null
+  max_pairs_per_stock: null
+
+hedge_ratio:
+  method: null
+  estimated_on: formation_window_only
+  intercept: null
+  dependent_leg_rule: null
+
+trading:                             # identical for the clustering arm and every baseline
+  trading_window: null
+  zscore_params_from: formation_window
+  entry_z: null
+  exit_z: null
+  stop_z: null
+  max_holding_days: null
+  signal_time: null
+  execution_time: null
+  sizing: null                       # dollar_neutral | beta_neutral
+  gross_exposure_cap: null
+  delisting_or_index_exit_rule: null
+
+baselines:                           # built inside equity_pairs/; same downstream rules
+  correlation:
+    rule: null
+  sector:
+    rule: null
+  same_stationarity_filters: null
+  match_pair_count: null
+
+costs:
+  commission_bps: null
+  half_spread_bps: null
+  slippage_bps: null
+  borrow_fee_annual_bps: null
+  dividends_on_short: null
+  corporate_actions: null
+  financing_rate: null
+  capital_base: null                 # committed | employed
+
+evaluation:
+  structural_feasibility_criteria: null   # frozen in Prompt 1; tested in Prompt 2 on development data only
+  primary_metric: null
+  baseline_comparison_test: null
+  stop_go: null
+  variant_budget: null
+  n_variants_tried: 0
+
+synthetic:
+  allowed_for: implementation_checks_only
+  seed: null

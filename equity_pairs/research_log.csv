@@ -1,0 +1,7 @@
+timestamp_utc,timestamp_ny,prompt,event_type,description,artifact,sha256
+2026-10-04T00:15:07Z,2026-10-03 20:15:07 EDT,0,setup,"Minimal repo inspection: git status, top-level names, root requirements.txt, root .gitignore, .venv package check. No root CLAUDE.md. No other-strategy files read. No credentials read.",,
+2026-10-04T00:15:07Z,2026-10-03 20:15:07 EDT,0,incidental_exposure,Other strategies' file names were visible in git status/top-level listing; contents not read.,,
+2026-10-04T00:15:07Z,2026-10-03 20:15:07 EDT,0,incidental_exposure,Research agent pretrained knowledge extends to ~mid-2026 and overlaps any plausible holdout; general market/sector awareness cannot be removed. Mitigation: freeze all choices before data; no discretionary stock/sector/pair choices.,,
+2026-10-04T00:18:51Z,2026-10-03 20:18:51 EDT,0,specification,"Created equity_pairs/ setup: CLAUDE.md, README.md, STATUS.md, CONTEXT.md, config.yaml (skeleton, all method fields null), research_log.csv. Holdout rule recorded: most recent min(20% of evaluation period, 2 years); dates undecided.",config.yaml,aa0c8178fd84af0c843d1ce0f38bdf19816eedd90b656292d1046ff22d805ab2
+2026-10-04T00:18:51Z,2026-10-03 20:18:51 EDT,0,specification,Deadline recorded: Sunday 2026-10-04 11:00 America/New_York; research note <= 5 pages; reproducible code.,,
+2026-10-04T00:18:51Z,2026-10-03 20:18:51 EDT,0,source_query,"None. No market data downloaded, no data sources queried, nothing fitted.",,
