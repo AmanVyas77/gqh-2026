@@ -161,6 +161,4 @@ was saved, the `turnover` column of `results/tables/oos_performance.csv` is blan
   `results/tables/trials.csv` was written from an earlier 162-row / 75-trial-row snapshot of the log and
   uses the same 25 configurations. Post-evaluation reproduction rows were kept in a separate review log
   that is not part of this repository.
-- **Erratum:** the note shows 20.7% maximum drawdown for the supplemental development row "A + overlay,
-  net"; the saved fraction 0.2064627979599919 rounds to 20.6%. No decision or headline uses it. Details in
-  [`paper/README.md`](paper/README.md).
+- **Reporting correction:** the supplemental A + overlay development drawdown is now 20.6%, directly rounded from the saved fraction. The paper also summarizes the prospective four-scenario [risk assessment](review/risk_methodology_assessment.md); no financial effectiveness is claimed. Details in [`paper/README.md`](paper/README.md).

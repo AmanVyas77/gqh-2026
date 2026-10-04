@@ -8,10 +8,13 @@ rerun to produce it. Both registered decisions (H1 and H2 rejected) are unchange
 
 The original frozen artifacts are in `../results/` and are hash-checked by `../verify_submission.py`.
 
-## Included (copied unchanged from the review checkout; hashes in `../submission/artifacts.json`)
+## Included (hashes in `../submission/artifacts.json`)
+
+The original review material was copied unchanged. The prospective risk assessment was subsequently added during paper integration; it is qualitative and introduces no new strategy calculations.
 
 | Path | Content |
 |---|---|
+| `risk_methodology_assessment.md` | Four prospective governance scenarios, capital definitions, responsibilities and unresolved dependencies; not an effectiveness test |
 | `extension/REPORT.md` | Uncertainty intervals, settlement-receipt checks, GF final-price uncertainty, funding requirements, actual-order capacity |
 | `extension/tables/*.csv` | Summary tables behind the note's [14] figures (intervals, placements interpretation, order capacity, funding envelopes, execution-session counts, receipt audit, GF finals, concentration, volume variability) |
 | `corrected/tables/*.csv` | Current-NAV risk, order participation, the post-evaluation execution correction (development only) and corrected robustness windows |
@@ -23,7 +26,7 @@ The original frozen artifacts are in `../results/` and are hash-checked by `../v
 
 - **Per-date detail tables** (`*_detail.csv`) and the GF missing-final exposure rows. They carry dated
   prices, volumes or NAV paths derived from licensed CME data.
-- **`offline.py` and its manifest**, which the note's reference [14] names, plus `run_development.py`,
+- **`offline.py` and its manifest**, plus `run_development.py`,
   `extension_analysis.py`, the patched `src/` files and the review trial log. The offline entry point
   pins the review checkout's patched sources and exact licensed local inputs, so it would refuse to run
   here, by design. For a market-data-free check of this submission, run `python verify_submission.py`.

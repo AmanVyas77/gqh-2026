@@ -192,6 +192,10 @@ class VerifierTests(unittest.TestCase):
         def drop_errata(c):
             c['errata'] = []
         self.edit_claims(drop_errata)
+        note = self.root / 'paper/research_note_edited.html'
+        text = note.read_text(encoding='utf-8')
+        self.assertIn('<td>20.6%</td>', text)
+        note.write_text(text.replace('<td>20.6%</td>', '<td>20.7%</td>', 1), encoding='utf-8')
         _, st = self.run_verify()
         self.assertEqual(st['claims.values_and_note'], 'fail')
 

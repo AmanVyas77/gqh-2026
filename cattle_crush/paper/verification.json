@@ -5,45 +5,44 @@
   "body_bounds": [
     [
       78.0,
-      81.58792877197266,
-      533.9765014648438,
-      570.4666748046875
+      81.36718719999999,
+      533.9999761999994,
+      707.3149412
     ],
     [
       78.0,
-      80.91519165039062,
-      532.7510375976562,
-      681.1666870117188
+      80.73583959999996,
+      532.7758588999995,
+      681.0149412000001
     ],
     [
       78.0,
-      80.91519165039062,
-      533.96923828125,
-      647.066650390625
+      80.73583959999996,
+      533.9999794999993,
+      646.9149412
     ],
     [
       78.0,
-      80.91519165039062,
-      533.9912109375,
-      678.8666381835938
+      80.73583959999996,
+      533.9999817999994,
+      704.1149412
     ],
     [
       78.0,
-      80.91519165039062,
-      533.9588012695312,
-      657.3666381835938
+      80.73583959999996,
+      533.9999793999995,
+      695.3149412
     ],
     [
       78.0,
-      80.91519165039062,
-      532.2559814453125,
-      647.3666381835938
+      80.73583959999996,
+      532.2548581999995,
+      659.9149412
     ]
   ],
-  "main_words_including_table_text_before": 1999,
-  "main_words_including_table_text_after": 1941,
-  "protected_files_unchanged": 56,
-  "table_check": "All retained cells identical except approved H1 net holdout drawdown rounding; H2 loss-below-initial-NAV column moved to editorial notes",
-  "visual_review": "All six pages inspected; final page-3 heading checked separately",
-  "no_backtests_or_holdout_evaluation": true
+  "table_check": "Overlay development drawdown corrected to 20.6% from saved fraction; other numeric table cells unchanged.",
+  "visual_review": "All pages reviewed during integration; latest changed page 5 rendered and inspected with no clipping or overlap.",
+  "no_backtests_or_holdout_evaluation": true,
+  "revision": "4 October 2026: prospective risk governance, portable reference [14], overlay rounding correction; exploratory post-hoc A/B funding sensitivity; Section 5 conclusion now summarizes funding sensitivity",
+  "pdf_text_check": "Every display value in the claims verifier report independently found in rebuilt PDF text using pdfplumber; prospective governance passage also confirmed."
 }

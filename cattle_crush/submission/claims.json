@@ -9,9 +9,7 @@
  "units": "Saved returns, volatilities, drawdowns and losses are fractions of fixed $1M initial capital unless a column says otherwise; placements_interpretation pct columns are already percent.",
  "categories": ["primary", "secondary", "overlay", "diagnostic", "risk_capacity", "trial_accounting"],
  "holdout_sources": ["results/tables/oos_performance.csv", "results/oos_lock.json"],
- "errata": [
-  {"claim": "h1_dev_A_overlay", "column": "max_drawdown", "note_shows": "20.7%", "saved_displays": "20.6%", "saved_value": 0.2064627979599919, "source": "results/tables/variant_a.csv (run=overlay, returns=net); review/corrected/tables/variant_a.csv carries the same value", "cause": "double rounding (20.646% -> 20.65 -> 20.7); the saved fraction rounds to 20.6% at one decimal", "materiality": "supplemental A + overlay development row; no registered test, decision or headline uses it", "status": "found 2026-10-04 by this verifier; PDF not rebuilt because ReportLab is not installed in this environment; disclosed in README.md"}
- ],
+ "errata": [],
  "formats": {
   "pct1": {"scale": 100, "dp": 1, "suffix": "%"},
   "pct2": {"scale": 100, "dp": 2, "suffix": "%"},
@@ -341,6 +339,7 @@
    "values": [{"column": "sharpe", "fmt": "snum2", "expected": "+0.63"}, {"column": "nw_t_monthly", "fmt": "num2", "expected": "0.97"}]}
  ],
  "not_machine_checked": [
+  "The exploratory post-hoc funding-sensitivity sentence is independently checked by the arithmetic N/IM >= 2/(1-0.20) against packaged funding_envelopes.csv minima (A 7.698403335860274; B 2.4063160548357345), as documented in review/risk_methodology_assessment.md; it is not an automated control-effectiveness test.",
   "+$153/head five-month margin recovery for the 15 distressed month-ends (source table not mapped).",
   "Sector-hedged basket held long: +0.52%/month (t = 1.57) (source table not mapped).",
   "Approximate holdout Sharpe standard error 0.7 (analytic approximation, not a saved value).",

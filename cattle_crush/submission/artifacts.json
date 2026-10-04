@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "purpose": "Required files and SHA-256 baselines for verify_submission.py. Written once by hand-run tooling on 2026-10-04; the verifier only reads it.",
+ "purpose": "Required files and SHA-256 baselines for verify_submission.py. Paper hashes explicitly updated for reporting-only integration on 2026-10-04; protected/code baselines unchanged. The verifier only reads this manifest.",
  "required": [
   ".env.example",
   "CLAUDE.md",
@@ -105,7 +105,8 @@
   "tests/test_oos_guard.py",
   "tests/test_signals.py",
   "tests/test_verify_submission.py",
-  "verify_submission.py"
+  "verify_submission.py",
+  "review/risk_methodology_assessment.md"
  ],
  "hashes": {
   "protected": {
@@ -191,18 +192,18 @@
    }
   },
   "paper": {
-   "scope": "current note, editable source, renderer and chart copied unchanged from output/pdf on 2026-10-04",
+   "scope": "current note updated 2026-10-04: prospective governance, corrected overlay rounding and packaged verifier reference; chart and renderer unchanged; exploratory post-hoc funding sensitivity added",
    "files": {
-    "paper/research_note_edited.pdf": "94ddc493e6c831907c2e763546a4571eda8eb31f7a21ddf26a0a1754480f7eda",
-    "paper/research_note_edited.html": "1ec18a9cffb185d8d0ddaf8e74ec17e0e05afddacd0f8b6ccc61b8a4593fe6bc",
+    "paper/research_note_edited.pdf": "64dcad897bc70532c4159b681d724c38fbfaaea9a3823a1b9cf0ebeceeb8811b",
+    "paper/research_note_edited.html": "a3c69b0e981197f0c76420654cc4eb9a49b2a84b5e0c22c6cac2edf33e5b6dfe",
     "paper/build_note.py": "0cc9912c39ba6db6fa115f482698b65086d179a606a93d0c26f2638317fbb9bc",
     "paper/archived_equity.png": "988f506b3bff2f9be775a41a97bf5428ab5af9d333378448ab1a6365802ec55a",
     "paper/archived_equity_relabeled.png": "b7b249e192dcc481d6a64016fdc36804df1e745f8820059c2150660299575575",
-    "paper/verification.json": "0456639addc4462cdbe77c995fa6ecf588e003ce24e2d0ac0d5188b68eefd25e"
+    "paper/verification.json": "92bc130dfc3db42525d8baa4fcaa69224f452f072279e1eaafcab41cb8262180"
    }
   },
   "post_evaluation": {
-   "scope": "post-evaluation review tables and reports copied unchanged from the review checkout on 2026-10-04",
+   "scope": "post-evaluation review tables and reports copied unchanged from the review checkout on 2026-10-04; qualitative risk assessment added during paper integration",
    "files": {
     "review/corrected/tables/h2_risk_current_nav.csv": "bb3dce67ffd1c71b8a4e696502c1a928e951c2e351eb894e0bf2b585d92fa122",
     "review/corrected/tables/order_participation_summary.csv": "3d24180f3c3b518a1e8bf2c8c752cfd67c233948dd7dc677aa0430d29c1b72cb",
@@ -221,13 +222,15 @@
     "review/extension/tables/settlement_receipt_summary.csv": "9dfd9edb22a6599b06db87d0b07516c7738a8ffd9635edc162952157ab1d0b78",
     "review/extension/tables/uncertainty.csv": "9532a088ce461c8c2437e61331eb60a19d9766390da5c89a71814b4cba82e282",
     "review/extension/tables/volume_variability.csv": "15ecb088da522a042cfcad48cc0d24a1bc926a77362a1efb59363dd27006cc91",
-    "review/regulatory_check.md": "6a408da9be3831be5b68f3e91da4928e98f7171f4389a55fdc5cbc1c7bd786cd"
+    "review/regulatory_check.md": "6a408da9be3831be5b68f3e91da4928e98f7171f4389a55fdc5cbc1c7bd786cd",
+    "review/risk_methodology_assessment.md": "65d2d68f2b9d91a3911a651d3669f68a5de1a820a541dfda1da023ed838aaec0"
    }
   }
  },
  "superseded_pdf_sha256": {
   "cb44f612f302e99df3e1ad14809eb1059a9e5c9a942fd2a5fabed518bd735b48": "note/research_note.pdf: freeze-time 4-page note, superseded",
-  "03b40986e405611c077e3a7d1c449e660cd26f9c8f60fa7d9c6be8b4b7b8924c": "older uploaded 'GQH_Research Note.pdf' (not in the repository), superseded"
+  "03b40986e405611c077e3a7d1c449e660cd26f9c8f60fa7d9c6be8b4b7b8924c": "older uploaded 'GQH_Research Note.pdf' (not in the repository), superseded",
+  "94ddc493e6c831907c2e763546a4571eda8eb31f7a21ddf26a0a1754480f7eda": "pre-governance packaged note with overlay rounding erratum, superseded"
  },
  "excluded_paper_references": {
   "review/offline.py": "post-evaluation review entry point; it pins the review checkout's patched sources and licensed local inputs, so it is not shipped. Use verify_submission.py for artifact checks; see review/README.md."
@@ -244,6 +247,7 @@
   "review/README.md",
   "review/editorial_revision/EDITORIAL_NOTES.md",
   "review/extension/REPORT.md",
-  "review/regulatory_check.md"
+  "review/regulatory_check.md",
+  "review/risk_methodology_assessment.md"
  ]
 }

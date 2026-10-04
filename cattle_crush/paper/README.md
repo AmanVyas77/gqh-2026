@@ -16,14 +16,11 @@ margins. Authors, in order: Aman Vyas, Zhicheng Li, Nicolas Slenko.
 older uploaded `GQH_Research Note.pdf` (not in this repository). The verifier fails if either is put in
 place of the current PDF.
 
-**Erratum.** The H1 development table shows 20.7% maximum drawdown for the supplemental "A + overlay, net"
-row. The saved fraction is 0.2064627979599919 (`results/tables/variant_a.csv`, run `overlay`, returns
-`net`), which rounds to **20.6%** at one decimal; 20.7% came from rounding twice. No registered test,
-decision or headline number uses this row. The PDF was not rebuilt in this pass because ReportLab is not
-installed here; the erratum is registered in `../submission/claims.json`, and the verifier reports it as
-an advisory item and fails on any other mismatch.
+**Reporting update, 4 October 2026.** The supplemental A + overlay development drawdown is now corrected to **20.6%**, directly rounded from saved fraction 0.2064627979599919. Section 4 adds an explicitly prospective, post-evaluation governance assessment; the full four-scenario matrix is in [`../review/risk_methodology_assessment.md`](../review/risk_methodology_assessment.md). Reference [14] now points to the packaged artifact verifier. No strategy results or decisions changed. The PDF was rebuilt with the existing bundled ReportLab runtime and visually checked.
 
 **Rebuilding** needs ReportLab and the macOS Arial fonts the renderer loads (not part of
 `../requirements.txt`): `python paper/build_note.py` from `cattle_crush/`. Browser printing of the HTML
 is not the verified build path. Relocated prose and the editorial history are in
 [`../review/editorial_revision/EDITORIAL_NOTES.md`](../review/editorial_revision/EDITORIAL_NOTES.md).
+
+**Funding sensitivity addition:** Section 4 now includes a joint A/B finding explicitly labeled exploratory and post-hoc. Its qualitative direction is independently supported by the packaged minimum NAV/margin ratios; no dated private scratch data, strategy changes or claims of control effectiveness were added. The holdout-access qualification moved to Section 1 and remains intact.

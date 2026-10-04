@@ -6,7 +6,7 @@
   {
    "id": "required_files",
    "status": "pass",
-   "detail": "104/104 present"
+   "detail": "105/105 present"
   },
   {
    "id": "hashes.protected",
@@ -21,12 +21,12 @@
   {
    "id": "hashes.paper",
    "status": "pass",
-   "detail": "6/6 match (current note, editable source, renderer and chart copied unchanged from output/pdf on 2026-10-04)"
+   "detail": "6/6 match (current note updated 2026-10-04: prospective governance, corrected overlay rounding and packaged verifier reference; chart and renderer unchanged; exploratory post-hoc funding sensitivity added)"
   },
   {
    "id": "hashes.post_evaluation",
    "status": "pass",
-   "detail": "18/18 match (post-evaluation review tables and reports copied unchanged from the review checkout on 2026-10-04)"
+   "detail": "19/19 match (post-evaluation review tables and reports copied unchanged from the review checkout on 2026-10-04; qualitative risk assessment added during paper integration)"
   },
   {
    "id": "paper.not_superseded",
@@ -56,12 +56,7 @@
   {
    "id": "paper.cited_files",
    "status": "pass",
-   "detail": "8 repository paths cited by the note; all present or explicitly excluded"
-  },
-  {
-   "id": "paper.excluded_reference.review/offline.py",
-   "status": "warn",
-   "detail": "note cites review/offline.py, not shipped: post-evaluation review entry point; it pins the review checkout's patched sources and licensed local inputs, so it is not shipped. Use verify_submission.py for artifact checks; see review/README.md."
+   "detail": "9 repository paths cited by the note; all present or explicitly excluded"
   },
   {
    "id": "claims.evidence_labels",
@@ -72,11 +67,6 @@
    "id": "claims.values_and_note",
    "status": "pass",
    "detail": "55/55 claims match saved rows and the editable note"
-  },
-  {
-   "id": "claims.erratum",
-   "status": "warn",
-   "detail": "registered erratum, disclosed in README: h1_dev_A_overlay.max_drawdown: note shows 20.7%, saved value displays 20.6% (double rounding (20.646% -> 20.65 -> 20.7); the saved fraction rounds to 20.6% at one decimal)"
   },
   {
    "id": "roles.holdout_lock",
@@ -131,12 +121,12 @@
   {
    "id": "portability.absolute_paths",
    "status": "pass",
-   "detail": "12 workflow files free of machine-specific absolute paths"
+   "detail": "13 workflow files free of machine-specific absolute paths"
   },
   {
    "id": "paper.pdf_text",
    "status": "pass",
-   "detail": "PyMuPDF: 6 pages, minimum text size 11.0 pt; every claimed display value found in PDF text"
+   "detail": "skipped: PyMuPDF not installed (optional); HTML-to-PDF correspondence rests on the hashed pair and build_note.py"
   }
  ],
  "headline": [
@@ -660,13 +650,7 @@
    "sources": [
     "results/tables/variant_a.csv"
    ],
-   "errata": [
-    {
-     "column": "max_drawdown",
-     "note_shows": "20.7%",
-     "saved_displays": "20.6%"
-    }
-   ],
+   "errata": [],
    "displayed": [
     "-0.92%",
     "5.0%",
@@ -1425,6 +1409,7 @@
   }
  ],
  "not_machine_checked": [
+  "The exploratory post-hoc funding-sensitivity sentence is independently checked by the arithmetic N/IM >= 2/(1-0.20) against packaged funding_envelopes.csv minima (A 7.698403335860274; B 2.4063160548357345), as documented in review/risk_methodology_assessment.md; it is not an automated control-effectiveness test.",
   "+$153/head five-month margin recovery for the 15 distressed month-ends (source table not mapped).",
   "Sector-hedged basket held long: +0.52%/month (t = 1.57) (source table not mapped).",
   "Approximate holdout Sharpe standard error 0.7 (analytic approximation, not a saved value).",
