@@ -1,0 +1,2 @@
+strategy,sharpe_annual,n_obs,psr,n_trials_project,sr0_annual,dsr_project,note
+H2 primary,-0.288185,2810,0.16676348821395964,25,0.31424971464399154,0.02161241084501824,H2 alternatives (4) not run; H2-only DSR undefined with one trial

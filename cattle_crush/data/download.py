@@ -389,13 +389,41 @@ def pull_spy(cfg: dict, oos: bool = False) -> None:
     print(f"  SPY: {len(df)} days, {df['date'].min():%Y-%m-%d} to {df['date'].max():%Y-%m-%d}")
 
 
+# --------------------------------------------------------------------------- H2 equities
+
+H2_TICKERS = ["TSN", "TXRH", "XLP", "XLY"]
+
+
+def pull_h2_equities(cfg: dict, oos: bool = False) -> None:
+    """Daily split- and dividend-adjusted closes for H2 (HYPOTHESIS_H2.md Section 3).
+    Development window 2009-01-01 to oos_start - 1 day; yfinance `end` is exclusive."""
+    import yfinance as yf
+    start = oos_start(cfg) if oos else pd.Timestamp("2009-01-01")
+    end = _window(cfg, oos)[1]
+    frames = {}
+    for tk in H2_TICKERS:
+        h = yf.Ticker(tk).history(start=f"{start:%Y-%m-%d}", end=f"{end:%Y-%m-%d}", auto_adjust=True)
+        if h.empty:
+            sys.exit(f"yfinance returned no data for {tk}")
+        frames[tk] = pd.Series(h["Close"].to_numpy(), index=h.index.tz_localize(None).normalize())
+    df = pd.DataFrame(frames).rename_axis("date").reset_index()
+    if not oos:
+        _assert_before(df, "date", oos_start(cfg), "H2 equities")
+    out = _out_dir(oos)
+    df.to_parquet(out / "h2_equities.parquet", index=False)
+    _write_manifest(out, "h2_equities", {"tickers": H2_TICKERS, "rows": len(df),
+                                         "first": str(df["date"].min().date()), "last": str(df["date"].max().date())})
+    print(f"  H2 equities: {len(df)} days, {df['date'].min():%Y-%m-%d} to {df['date'].max():%Y-%m-%d}; "
+          f"missing values: {int(df[H2_TICKERS].isna().sum().sum())}")
+
+
 # --------------------------------------------------------------------------- CLI
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--estimate", action="store_true", help="print the Databento cost estimate and exit")
     ap.add_argument("--probe-nass", action="store_true", help="list NASS series for config.nass.query")
-    ap.add_argument("--pull", nargs="+", choices=["databento", "nass", "cftc", "spy", "all"])
+    ap.add_argument("--pull", nargs="+", choices=["databento", "nass", "cftc", "spy", "h2", "all"])
     ap.add_argument("--yes", action="store_true", help="confirm the Databento purchase after the estimate")
     args = ap.parse_args()
     cfg = load_config()
@@ -422,6 +450,8 @@ def main() -> None:
         pull_cftc(cfg)
     if "spy" in sources:
         pull_spy(cfg)
+    if "h2" in sources:
+        pull_h2_equities(cfg)
 
 
 if __name__ == "__main__":

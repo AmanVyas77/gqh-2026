@@ -16,10 +16,11 @@ import audit  # noqa: E402
 import download  # noqa: E402
 import pandas as pd  # noqa: E402
 
-from src import analysis, backtest, margin, mechanism, reports, signals  # noqa: E402
+from src import analysis, backtest, h2, margin, mechanism, reports, signals  # noqa: E402
 from src.config import PROCESSED, RAW, RESULTS, load_config  # noqa: E402
 
 RAW_FILES = {
+    "h2": ["h2_equities.parquet"],
     "databento": [f"{r}_{k}.parquet" for r in ("LE", "GF", "ZC") for k in ("definition", "statistics", "ohlcv1d")],
     "nass": ["nass_placements.parquet"],
     "cftc": ["cftc_live_cattle.parquet"],
@@ -39,7 +40,7 @@ def ensure_data(cfg: dict, yes: bool) -> None:
                 sys.exit("Databento data must be purchased; review the estimate and re-run with --yes.")
             download.pull_databento(cfg)
         else:
-            getattr(download, f"pull_{source}")(cfg)
+            getattr(download, "pull_h2_equities" if source == "h2" else f"pull_{source}")(cfg)
 
 
 def main() -> None:
@@ -103,6 +104,14 @@ def main() -> None:
     by_leg.to_csv(RESULTS / "tables" / "liquidity_by_leg.csv", index=False)
     cap.to_csv(RESULTS / "tables" / "capital.csv", index=False)
     print("written: stress_episodes.csv, stress_limit_shock.csv, liquidity_by_leg.csv, capital.csv")
+
+    print("\n[9] H2 (HYPOTHESIS_H2.md): primary specification, development data only (logged)")
+    out = h2.evaluate()
+    pd.DataFrame(out["tests"]).T.to_csv(RESULTS / "tables" / "h2_tests.csv")
+    pd.DataFrame(out["performance"]).T.to_csv(RESULTS / "tables" / "h2_performance.csv")
+    out["annual"].to_csv(RESULTS / "tables" / "h2_annual.csv")
+    for k, v in out["tests"].items():
+        print(f"{k}: beta {v['beta']:+.5f}  NW t {v['t_nw']:+.2f}  n {v['n']}  pass={v['pass']}")
 
 def plot_equity(curves: dict, path, title: str = "Variant A (primary spec), in-sample") -> None:
     """Cumulative return on fixed capital, one line per curve (same units, one axis)."""
